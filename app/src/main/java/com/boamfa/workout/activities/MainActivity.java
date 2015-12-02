@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 
 import com.boamfa.workout.R;
@@ -27,24 +26,8 @@ public class MainActivity extends BaseActivity {
             Intent i = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(i);
         } else {
-            Intent i = new Intent(MainActivity.this, TrackerActivity.class);
+            Intent i = new Intent(MainActivity.this, TracksActivity.class);
             startActivity(i);
         }
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
-    }
-
 }

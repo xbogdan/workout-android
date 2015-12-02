@@ -1,10 +1,6 @@
 package com.boamfa.workout.utils;
 
-import android.app.Activity;
-import android.content.Context;
 import android.util.Pair;
-
-import org.json.JSONObject;
 
 import java.util.HashMap;
 
@@ -13,7 +9,8 @@ import java.util.HashMap;
  */
 public class AppService {
 
-    private static final String endPoint = "http://192.168.1.218:3000/api/v1";
+    private static final String endPoint = "http://192.168.0.102:3000/api/v1";
+//    private static final String endPoint = "http://192.168.2.1:3000/api/v1";
     private static final HttpCaller httpConn = new HttpCaller(false);
 
     public AppService() {
@@ -30,9 +27,6 @@ public class AppService {
         Pair<Integer, String> response = null;
         try {
             response = httpConn.sendRequest(endPoint + "/signin", "POST", postParams, requestHeaders);
-            if (response.first != 200) {
-                // TODO: alert if error
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,12 +42,21 @@ public class AppService {
         Pair<Integer, String> response = null;
         try {
             response = httpConn.sendRequest(endPoint + "/tracks", "GET", null, requestHeaders);
-//            if (response.first != 200) {
-                // TODO: alert if error
-//            }
-            if (response.first == 401) {
-                return null;
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    public Pair<Integer, String> getTrack(String token, Integer trackId) {
+        HashMap<String, String> requestHeaders = new HashMap<String, String>();
+        requestHeaders.put("withCredentials", "true");
+        requestHeaders.put("Authorization", token);
+
+        Pair<Integer, String> response = null;
+        try {
+            response = httpConn.sendRequest(endPoint + "/track?id=" + trackId, "GET", null, requestHeaders);
         } catch (Exception e) {
             e.printStackTrace();
         }

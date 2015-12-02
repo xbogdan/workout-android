@@ -1,6 +1,7 @@
 package com.boamfa.workout.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.boamfa.workout.R;
+import com.boamfa.workout.activities.TracksActivity;
 
 /**
  * Created by bogdan on 23/11/15.
@@ -47,6 +49,15 @@ public class DrawerAdapter extends BaseAdapter {
         }
         TextView itemTitle = (TextView) row.findViewById(R.id.textView);
         itemTitle.setText(this.items[position]);
+        if (this.items[position].equals("Tracker")) {
+            row.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, TracksActivity.class);
+                    context.startActivity(i);
+                }
+            });
+        }
         return row;
     }
 }

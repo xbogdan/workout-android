@@ -26,7 +26,11 @@
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login" >
         </activity>
-        <activity android:name=".activities.TrackerActivity" >
+        <activity android:name=".activities.TracksActivity" >
+        </activity>
+        <activity android:name=".activities.TrackActivity" >
+        </activity>
+        <activity android:name=".activities.TrackDaysActivity" >
         </activity>
     </application>
 

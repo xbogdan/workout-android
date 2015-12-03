@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:orientation="vertical" android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+    <!--<TextView-->
+        <!--android:id="@+id/tracker_item_text_view"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:padding="15dp"-->
+        <!--android:textColor="@android:color/black"-->
+        <!--android:layout_height="match_parent" />-->
+<!--</LinearLayout>-->
+
+<com.daimajia.swipe.SwipeLayout
+    android:id="@+id/swipe"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="80dp">
+    <!-- Bottom View Start-->
+    <LinearLayout
+        android:background="@android:color/holo_red_dark"
+        android:id="@+id/bottom_wrapper"
+        android:layout_width="100dp"
+        android:weightSum="1"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_height="match_parent">
+        <!--What you want to show-->
+
+        <TextView
+            android:id="@+id/delete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:text="Delete"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp" />
+    </LinearLayout>
+    <!-- Bottom View End-->
+
+    <!-- Surface View Start -->
+    <LinearLayout
+        android:id="@+id/surface_view"
+        android:background="#ffffff"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <!--What you want to show in SurfaceView-->
+
+        <TextView
+            android:id="@+id/surface_text_view"
+            android:padding="15dp"
+            android:textColor="@android:color/black"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+    <!-- Surface View End -->
+</com.daimajia.swipe.SwipeLayout>

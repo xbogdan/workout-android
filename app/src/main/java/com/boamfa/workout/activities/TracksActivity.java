@@ -12,10 +12,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.boamfa.workout.R;
+import com.boamfa.workout.adapters.TracksSwipeAdapter;
 import com.boamfa.workout.utils.AppService;
 import com.boamfa.workout.utils.User;
 import com.boamfa.workout.utils.UserLocalStore;
@@ -89,8 +89,10 @@ public class TracksActivity extends BaseActivity {
                             JSONObject objectInArray = tracks.getJSONObject(i);
                             trackNameList.add((String) objectInArray.get("name"));
                         }
-                        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.track_item, R.id.tracker_item_text_view, trackNameList);
-                        tracksList.setAdapter(arrayAdapter);
+
+                        TracksSwipeAdapter tracksAdapter = new TracksSwipeAdapter(this, trackNameList);
+
+                        tracksList.setAdapter(tracksAdapter);
                         tracksList.setClickable(true);
                         tracksList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override

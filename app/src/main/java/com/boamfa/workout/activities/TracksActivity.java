@@ -90,7 +90,7 @@ public class TracksActivity extends BaseActivity {
                             trackNameList.add((String) objectInArray.get("name"));
                         }
 
-                        TracksSwipeAdapter tracksAdapter = new TracksSwipeAdapter(this, trackNameList);
+                        TracksSwipeAdapter tracksAdapter = new TracksSwipeAdapter(this, R.layout.tracks_item, R.id.swipe, trackNameList);
 
                         tracksList.setAdapter(tracksAdapter);
                         tracksList.setClickable(true);

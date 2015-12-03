@@ -4,16 +4,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewManager;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.boamfa.workout.R;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -24,21 +20,23 @@ public class TracksSwipeAdapter extends BaseSwipeAdapter {
     private Context context;
     private List objects;
     private int resource;
+    private int textViewResourceId;
 
-    public TracksSwipeAdapter(Context context, List<String> objects) {
+    public TracksSwipeAdapter(Context context, int resource, int textViewResourceId, List<String> objects) {
         this.context = context;
         this.objects = objects;
-//        this.resource = resource;
+        this.resource = resource;
+        this.textViewResourceId = textViewResourceId;
     }
 
     @Override
     public int getSwipeLayoutResourceId(int position) {
-        return R.id.swipe;
+        return textViewResourceId;
     }
 
     @Override
     public View generateView(final int position, ViewGroup parent) {
-        View v = LayoutInflater.from(context).inflate(R.layout.tracks_item, null);
+        View v = LayoutInflater.from(context).inflate(resource, null);
         final SwipeLayout swipeLayout = (SwipeLayout) v.findViewById(getSwipeLayoutResourceId(position));
         swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         swipeLayout.addSwipeListener(new SimpleSwipeListener() {

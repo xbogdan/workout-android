@@ -26,11 +26,17 @@
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login" >
         </activity>
-        <activity android:name=".activities.TracksActivity" >
+        <activity
+            android:name=".activities.TracksActivity"
+            android:launchMode="singleTask">
         </activity>
-        <activity android:name=".activities.TrackActivity" >
+        <activity
+            android:name=".activities.TrackActivity"
+            android:launchMode="singleTask">
         </activity>
-        <activity android:name=".activities.TrackDaysActivity" >
+        <activity
+            android:name=".activities.TrackDaysActivity"
+            android:launchMode="singleTask">
         </activity>
     </application>
 

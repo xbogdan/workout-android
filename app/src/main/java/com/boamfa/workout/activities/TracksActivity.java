@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.TracksSwipeAdapter;
+import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.utils.AppService;
 import com.boamfa.workout.utils.User;
 import com.boamfa.workout.utils.UserLocalStore;
@@ -43,12 +44,7 @@ public class TracksActivity extends BaseActivity {
 
         tracksList = (ListView) findViewById(R.id.tracksList);
         MainTask task = new MainTask();
-        task.execute((Void) null);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+        task.execute();
     }
 
     @Override
@@ -83,11 +79,11 @@ public class TracksActivity extends BaseActivity {
                     try {
                         jsonResponse = new JSONObject(response.second);
                         final JSONArray tracks = jsonResponse.getJSONArray("tracks");
-                        List<String> trackNameList = new ArrayList<String>();
+                        List<Track> trackNameList = new ArrayList<Track>();
 
                         for (int i = 0, size = tracks.length(); i < size; i++) {
                             JSONObject objectInArray = tracks.getJSONObject(i);
-                            trackNameList.add((String) objectInArray.get("name"));
+                            trackNameList.add(new Track((int) objectInArray.get("id"), (String) objectInArray.get("name")));
                         }
 
                         TracksSwipeAdapter tracksAdapter = new TracksSwipeAdapter(this, R.layout.tracks_item, R.id.swipe, trackNameList);

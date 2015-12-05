@@ -7,11 +7,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.text.InputType;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.boamfa.workout.R;
@@ -31,6 +34,8 @@ import java.util.List;
 public class TracksActivity extends BaseActivity {
 
     private ListView tracksList;
+    private List<Track> trackNameList;
+    private TracksSwipeAdapter tracksAdapter;
     private final Activity self = this;
 
     @Override
@@ -41,6 +46,36 @@ public class TracksActivity extends BaseActivity {
         View contentView = inflater.inflate(R.layout.activity_tracks, null, false);
 
         drawerLayout.addView(contentView, 0);
+
+        FloatingActionButton floatingActionButton = (FloatingActionButton) contentView.findViewById(R.id.fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(self);
+                builder.setTitle("Name");
+
+                // Set up the input
+                final EditText input = new EditText(self);
+                input.setTextColor(getResources().getColor(R.color.black));
+                builder.setView(input);
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String m_Text = input.getText().toString();
+                        (new CreateTrackTask(m_Text)).execute();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+            }
+        });
 
         tracksList = (ListView) findViewById(R.id.tracksList);
         MainTask task = new MainTask();
@@ -79,14 +114,14 @@ public class TracksActivity extends BaseActivity {
                     try {
                         jsonResponse = new JSONObject(response.second);
                         final JSONArray tracks = jsonResponse.getJSONArray("tracks");
-                        List<Track> trackNameList = new ArrayList<Track>();
+                        trackNameList = new ArrayList<Track>();
 
                         for (int i = 0, size = tracks.length(); i < size; i++) {
                             JSONObject objectInArray = tracks.getJSONObject(i);
                             trackNameList.add(new Track((int) objectInArray.get("id"), (String) objectInArray.get("name")));
                         }
 
-                        TracksSwipeAdapter tracksAdapter = new TracksSwipeAdapter(this, R.layout.tracks_item, R.id.swipe, trackNameList);
+                        tracksAdapter = new TracksSwipeAdapter(this, R.layout.tracks_item, R.id.swipe, trackNameList);
 
                         tracksList.setAdapter(tracksAdapter);
                         tracksList.setClickable(true);
@@ -135,6 +170,42 @@ public class TracksActivity extends BaseActivity {
         protected void onPostExecute(final Boolean success) {
             if (success) {
                 fillListView(this.response);
+            } else {
+                // TODO: task failed
+            }
+        }
+    }
+
+    public class CreateTrackTask extends AsyncTask<Void, Void, Boolean> {
+        private Pair<Integer, String> response;
+        private String trackName;
+
+        public CreateTrackTask(String trackName) {
+            this.trackName = trackName;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            UserLocalStore userLocalStore = new UserLocalStore(self);
+            User currentUser = userLocalStore.getLoggedInUser();
+            AppService service = new AppService();
+            response = service.createTrack(currentUser.auth_token, trackName);
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+                System.out.println(response.second);
+                try {
+                    JSONObject jsonResponse = new JSONObject(response.second);
+                    int trackId = jsonResponse.getInt("track_id");
+                    System.out.println(trackId);
+                    trackNameList.add(new Track(trackId, trackName));
+                    tracksAdapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             } else {
                 // TODO: task failed
             }

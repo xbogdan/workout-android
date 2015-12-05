@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -39,6 +40,7 @@ import com.boamfa.workout.utils.AppService;
 import com.boamfa.workout.utils.User;
 import com.boamfa.workout.utils.UserLocalStore;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -301,6 +303,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private final String mEmail;
         private final String mPassword;
         private final Activity mActivity;
+        private Pair<Integer, String> response;
 
         UserLoginTask(String email, String password, Activity activity) {
             mEmail = email;
@@ -310,21 +313,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            try {
-                AppService service = new AppService();
-                Pair<Integer, String> response = service.login(this.mEmail, this.mPassword);
-
-                JSONObject jsonResponse = new JSONObject(response.second);
-                UserLocalStore userLocalStore = new UserLocalStore(this.mActivity);
-
-                User user = new User(jsonResponse.getInt("id"), jsonResponse.getString("email"), jsonResponse.getString("auth_token"));
-                userLocalStore.storeUserData(user);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            // TODO: register the new account here.
-
+            AppService service = new AppService();
+            response = service.login(this.mEmail, this.mPassword);
             return true;
         }
 
@@ -334,7 +324,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                finish();
+                JSONObject jsonResponse = null;
+                try {
+                    jsonResponse = new JSONObject(response.second);
+                    UserLocalStore userLocalStore = new UserLocalStore(this.mActivity);
+                    User user = new User(jsonResponse.getInt("id"), jsonResponse.getString("email"), jsonResponse.getString("auth_token"));
+                    userLocalStore.storeUserData(user);
+
+                    Intent i = new Intent(LoginActivity.this, TracksActivity.class);
+                    startActivity(i);
+
+                    finish();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();

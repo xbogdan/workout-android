@@ -44,6 +44,7 @@ public class TracksSwipeAdapter extends BaseSwipeAdapter {
     public View generateView(final int position, ViewGroup parent) {
         View v = LayoutInflater.from(context).inflate(resource, null);
         final SwipeLayout swipeLayout = (SwipeLayout) v.findViewById(getSwipeLayoutResourceId(position));
+        swipeLayout.setDragEdge(SwipeLayout.DragEdge.Left);
         swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         swipeLayout.addSwipeListener(new SimpleSwipeListener() {
             @Override

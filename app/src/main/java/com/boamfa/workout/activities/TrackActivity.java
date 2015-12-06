@@ -67,7 +67,6 @@ public class TrackActivity extends BaseActivity {
 
     public void fillListView(Pair<Integer, String> response) {
         if (response == null) {
-            UserLocalStore userLocalStore = new UserLocalStore(this);
             userLocalStore.clearUserData();
             // TODO: Network error
         } else {
@@ -112,7 +111,6 @@ public class TrackActivity extends BaseActivity {
                     }
                     break;
                 case 401:
-                    UserLocalStore userLocalStore = new UserLocalStore(this);
                     userLocalStore.clearUserData();
                     Intent i = new Intent(TrackActivity.this, LoginActivity.class);
                     startActivity(i);
@@ -128,9 +126,6 @@ public class TrackActivity extends BaseActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            AppService service = new AppService();
-            UserLocalStore userLocalStore = new UserLocalStore(self);
-            User currentUser = userLocalStore.getLoggedInUser();
             response = service.getTrack(currentUser.auth_token, trackId);
             return true;
         }

@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.text.InputType;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -52,7 +51,7 @@ public class TracksActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(self);
-                builder.setTitle("Name");
+                builder.setTitle("Track name");
 
                 // Set up the input
                 final EditText input = new EditText(self);
@@ -87,24 +86,8 @@ public class TracksActivity extends BaseActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void alertMessage(String title, String message) {
-        final AlertDialog.Builder builder=new AlertDialog.Builder(this);
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.setIcon(android.R.drawable.ic_dialog_alert);
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
-        builder.show();
-    }
-
     public void fillListView(Pair<Integer, String> response) {
         if (response == null) {
-            UserLocalStore userLocalStore = new UserLocalStore(this);
             userLocalStore.clearUserData();
             // TODO: Network error
         } else {
@@ -143,7 +126,6 @@ public class TracksActivity extends BaseActivity {
                     }
                     break;
                 case 401:
-                    UserLocalStore userLocalStore = new UserLocalStore(this);
                     userLocalStore.clearUserData();
                     Intent i = new Intent(TracksActivity.this, LoginActivity.class);
                     startActivity(i);
@@ -159,9 +141,6 @@ public class TracksActivity extends BaseActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            AppService service = new AppService();
-            UserLocalStore userLocalStore = new UserLocalStore(self);
-            User currentUser = userLocalStore.getLoggedInUser();
             response = service.getTracks(currentUser.auth_token);
             return true;
         }
@@ -186,9 +165,6 @@ public class TracksActivity extends BaseActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            UserLocalStore userLocalStore = new UserLocalStore(self);
-            User currentUser = userLocalStore.getLoggedInUser();
-            AppService service = new AppService();
             response = service.createTrack(currentUser.auth_token, trackName);
             return true;
         }
@@ -196,11 +172,9 @@ public class TracksActivity extends BaseActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-                System.out.println(response.second);
                 try {
                     JSONObject jsonResponse = new JSONObject(response.second);
                     int trackId = jsonResponse.getInt("track_id");
-                    System.out.println(trackId);
                     trackNameList.add(new Track(trackId, trackName));
                     tracksAdapter.notifyDataSetChanged();
                 } catch (JSONException e) {

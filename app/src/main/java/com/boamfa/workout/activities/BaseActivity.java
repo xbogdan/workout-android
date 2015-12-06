@@ -1,5 +1,7 @@
 package com.boamfa.workout.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -11,6 +13,9 @@ import android.widget.ListView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.DrawerAdapter;
+import com.boamfa.workout.utils.AppService;
+import com.boamfa.workout.utils.User;
+import com.boamfa.workout.utils.UserLocalStore;
 
 /**
  * Created by bogdan on 25/11/15.
@@ -21,6 +26,9 @@ public class BaseActivity extends AppCompatActivity {
     protected ActionBarDrawerToggle drawerListener;
     protected ListView listView;
     protected DrawerAdapter drawerAdapter;
+    protected AppService service;
+    protected User currentUser;
+    protected UserLocalStore userLocalStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +66,10 @@ public class BaseActivity extends AppCompatActivity {
 
         drawerLayout.setDrawerListener(drawerListener);
 
+        service = new AppService();
+        userLocalStore = new UserLocalStore(this);
+        currentUser = userLocalStore.getLoggedInUser();
+
     }
 
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -72,5 +84,20 @@ public class BaseActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    protected void alertMessage(String title, String message) {
+        final AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.show();
     }
 }

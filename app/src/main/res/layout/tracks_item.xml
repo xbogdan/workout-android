@@ -17,9 +17,8 @@
     android:layout_height="80dp">
     <!-- Bottom View Start-->
     <LinearLayout
-        android:background="@android:color/holo_red_dark"
         android:id="@+id/bottom_wrapper"
-        android:layout_width="100dp"
+        android:layout_width="160dp"
         android:weightSum="1"
         android:gravity="center"
         android:orientation="horizontal"
@@ -28,13 +27,27 @@
 
         <TextView
             android:id="@+id/delete"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
             android:layout_weight="5"
             android:text="Delete"
             android:textAlignment="center"
+            android:gravity="center"
             android:textColor="#FFFFFF"
-            android:textSize="17sp" />
+            android:background="@android:color/holo_red_dark"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/edit"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:text="Edit"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:background="#f1c40f"
+            android:textSize="14sp" />
     </LinearLayout>
     <!-- Bottom View End-->
 

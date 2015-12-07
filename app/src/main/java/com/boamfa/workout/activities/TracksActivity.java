@@ -19,9 +19,6 @@ import android.widget.ListView;
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.TracksSwipeAdapter;
 import com.boamfa.workout.classes.Track;
-import com.boamfa.workout.utils.AppService;
-import com.boamfa.workout.utils.User;
-import com.boamfa.workout.utils.UserLocalStore;
 
 import org.json.JSONArray;
 import org.json.JSONException;

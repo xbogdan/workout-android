@@ -14,9 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.boamfa.workout.R;
-import com.boamfa.workout.utils.AppService;
-import com.boamfa.workout.utils.User;
-import com.boamfa.workout.utils.UserLocalStore;
 
 import org.json.JSONArray;
 import org.json.JSONException;

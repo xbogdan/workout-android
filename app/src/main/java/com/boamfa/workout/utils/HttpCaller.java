@@ -56,7 +56,7 @@ public class HttpCaller {
             }
         }
 
-        if (requestType.equals("POST")) {
+        if (requestType.equals("POST") || requestType.equals("PUT") || requestType.equals("PATCH")) {
             // Set request parameters
             String urlParameters = "";
             if (params != null) {

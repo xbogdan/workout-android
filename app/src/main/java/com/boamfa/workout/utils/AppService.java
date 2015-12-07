@@ -98,18 +98,14 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> updateTrack(String token, int trackId, String trackName) {
-        HashMap<String, String> postParams = new HashMap<String, String>();
-        postParams.put("track[id]", trackId+"");
-        postParams.put("track[name]", trackName);
-
+    public Pair<Integer, String> updateTrack(String token, HashMap<String, String> postParams) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
         requestHeaders.put("Authorization", token);
 
         Pair<Integer, String> response = null;
         try {
-            response = httpConn.sendRequest(endPoint + "/updateTrack?id=5", "PUT", postParams, requestHeaders);
+            response = httpConn.sendRequest(endPoint + "/updateTrack", "PUT", postParams, requestHeaders);
         } catch (Exception e) {
             e.printStackTrace();
         }

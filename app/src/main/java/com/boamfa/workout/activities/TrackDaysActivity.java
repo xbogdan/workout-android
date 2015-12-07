@@ -3,34 +3,21 @@ package com.boamfa.workout.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Pair;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.ExpandListAdapter;
 import com.boamfa.workout.classes.ExpandListChild;
 import com.boamfa.workout.classes.ExpandListGroup;
-import com.boamfa.workout.utils.UserLocalStore;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class TrackDaysActivity extends BaseActivity {
 
@@ -39,7 +26,6 @@ public class TrackDaysActivity extends BaseActivity {
     private ExpandListAdapter ExpAdapter;
     private ArrayList<ExpandListGroup> ExpListItems;
     private ExpandableListView ExpandList;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -19,6 +19,7 @@ import com.boamfa.workout.utils.UserLocalStore;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -160,7 +161,10 @@ public class TracksSwipeAdapter extends BaseSwipeAdapter {
             AppService service = new AppService();
             UserLocalStore userLocalStore = new UserLocalStore(context);
             User currentUser = userLocalStore.getLoggedInUser();
-            response = service.updateTrack(currentUser.auth_token, trackId, trackName);
+            HashMap<String, String> postParams = new HashMap<String, String>();
+            postParams.put("track[id]", trackId + "");
+            postParams.put("track[name]",trackName);
+            response = service.updateTrack(currentUser.auth_token, postParams);
             return true;
         }
 

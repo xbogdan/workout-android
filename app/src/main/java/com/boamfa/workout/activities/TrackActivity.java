@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Pair;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -15,12 +16,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.boamfa.workout.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -111,32 +115,45 @@ public class TrackActivity extends BaseActivity {
                         final JSONObject track = jsonResponse.getJSONObject("track");
                         final JSONArray days = track.getJSONArray("track_days_attributes");
                         listItems = new ArrayList<String>();
+                        int daysNr = days.length();
+                        if (daysNr == 0) {
+                            LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            View noDataView = inflater.inflate(R.layout.listview_no_data, null, false);
 
-                        for (int i = 0, size = days.length(); i < size; i++) {
-                            JSONObject objectInArray = days.getJSONObject(i);
-                            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-                            Date date = format.parse(objectInArray.get("date").toString());
+                            TextView noDataTextView = (TextView) noDataView.findViewById(R.id.listview_no_data);
+                            noDataTextView.setText("No track days :(");
+                            noDataTextView.setGravity(Gravity.CENTER);
 
-                            DateFormat format2 = new SimpleDateFormat("dd MMMM, yyyy", Locale.US);
-                            String newDate = format2.format(date);
+                            RelativeLayout rl = (RelativeLayout) findViewById(R.id.track_layout);
+                            noDataTextView.setWidth(rl.getWidth());
+                            rl.addView(noDataTextView);
+                        } else {
+                            for (int i = 0, size = daysNr; i < size; i++) {
+                                JSONObject objectInArray = days.getJSONObject(i);
+                                DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                                Date date = format.parse(objectInArray.get("date").toString());
 
-                            listItems.add(newDate);
-                        }
-                        arrayAdapter = new ArrayAdapter<String>(this, R.layout.track_item, R.id.tracker_item_text_view, listItems);
-                        trackDayList.setAdapter(arrayAdapter);
-                        trackDayList.setClickable(true);
-                        trackDayList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                try {
-                                    Intent i = new Intent(TrackActivity.this, TrackDaysActivity.class);
-                                    i.putExtra("day", days.getJSONObject(position).toString());
-                                    startActivity(i);
-                                } catch (JSONException e) {
-//                                    alertMessage("Error", "Invalid track id.");
-                                }
+                                DateFormat format2 = new SimpleDateFormat("dd MMMM, yyyy", Locale.US);
+                                String newDate = format2.format(date);
+
+                                listItems.add(newDate);
                             }
-                        });
+                            arrayAdapter = new ArrayAdapter<String>(this, R.layout.track_item, R.id.tracker_item_text_view, listItems);
+                            trackDayList.setAdapter(arrayAdapter);
+                            trackDayList.setClickable(true);
+                            trackDayList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    try {
+                                        Intent i = new Intent(TrackActivity.this, TrackDaysActivity.class);
+                                        i.putExtra("day", days.getJSONObject(position).toString());
+                                        startActivity(i);
+                                    } catch (JSONException e) {
+//                                    alertMessage("Error", "Invalid track id.");
+                                    }
+                                }
+                            });
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     } catch (ParseException e) {

@@ -24,7 +24,6 @@ import com.boamfa.workout.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -60,40 +59,34 @@ public class TrackActivity extends BaseActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Calendar myCalendar = Calendar.getInstance();
+            final Calendar myCalendar = Calendar.getInstance();
 
-                DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        myCalendar.set(Calendar.YEAR, year);
-                        myCalendar.set(Calendar.MONTH, monthOfYear);
-                        myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-                        String newDate = format.format(myCalendar.getTime());
-                        (new CreateTrackDayTask(newDate)).execute();
-                    }
+            DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                String newDate = format.format(myCalendar.getTime());
+                (new CreateTrackDayTask(newDate)).execute();
+                }
 
-                };
+            };
 
-                new DatePickerDialog(
-                        self,
-                        date,
-                        myCalendar.get(Calendar.YEAR),
-                        myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)
-                ).show();
+            new DatePickerDialog(
+                self,
+                date,
+                myCalendar.get(Calendar.YEAR),
+                myCalendar.get(Calendar.MONTH),
+                myCalendar.get(Calendar.DAY_OF_MONTH)
+            ).show();
             }
         });
 
         trackDayList = (ListView) findViewById(R.id.trackDayList);
 
-        MainTask task = new MainTask();
-        task.execute((Void) null);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+        (new MainTask()).execute();
 
     }
 
@@ -141,7 +134,7 @@ public class TrackActivity extends BaseActivity {
                             arrayAdapter = new ArrayAdapter<String>(this, R.layout.track_item, R.id.tracker_item_text_view, listItems);
                             trackDayList.setAdapter(arrayAdapter);
                             trackDayList.setClickable(true);
-                            trackDayList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            trackDayList.setOnItemClickListener(new ListView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                     try {

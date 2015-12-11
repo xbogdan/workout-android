@@ -6,14 +6,13 @@ import java.util.List;
 /**
  * Created by bogdan on 10/12/15.
  */
-public class TrackDay implements Serializable {
+public class TrackDayExercise implements Serializable {
     public int id;
     public String name;
-    public String date;
-    public List<TrackDayExercise> exercises;
+    public List<TrackDayExerciseSet> sets;
 
-    public TrackDay(int id, String date) {
+    public TrackDayExercise(int id, String name) {
         this.id = id;
-        this.date = date;
+        this.name = name;
     }
 }

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.boamfa.workout.R;
 import com.boamfa.workout.classes.ExpandListChild;
 import com.boamfa.workout.classes.ExpandListGroup;
+import com.daimajia.swipe.SwipeLayout;
 
 import java.util.ArrayList;
 
@@ -51,7 +52,20 @@ public class ExpandListAdapter extends BaseExpandableListAdapter {
             LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
             view = infalInflater.inflate(R.layout.expandlist_child_item, null);
         }
-        TextView tv = (TextView) view.findViewById(R.id.tvChild);
+
+        final SwipeLayout swipeLayout = (SwipeLayout) view.findViewById(R.id.swipe);
+        swipeLayout.addDrag(SwipeLayout.DragEdge.Left, view.findViewById(R.id.bottom_wrapper));
+        swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
+
+        view.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                swipeLayout.close(false);
+                System.out.println("============== TEST ITEM ==============");
+            }
+        });
+
+        TextView tv = (TextView) view.findViewById(R.id.surface_text_view);
         tv.setText(child.getReps() + " reps  x  " + child.getWeight() + " kg");
         // TODO Auto-generated method stub
         return view;
@@ -86,7 +100,20 @@ public class ExpandListAdapter extends BaseExpandableListAdapter {
             LayoutInflater inf = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
             view = inf.inflate(R.layout.expandlist_group_item, null);
         }
-        TextView tv = (TextView) view.findViewById(R.id.tvGroup);
+
+        final SwipeLayout swipeLayout = (SwipeLayout) view.findViewById(R.id.swipe);
+        swipeLayout.addDrag(SwipeLayout.DragEdge.Left, view.findViewById(R.id.bottom_wrapper));
+        swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
+
+        view.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                swipeLayout.close(false);
+                System.out.println("============== TEST ==============");
+            }
+        });
+
+        TextView tv = (TextView) view.findViewById(R.id.surface_text_view);
         tv.setText(group.getName());
         // TODO Auto-generated method stub
         return view;

@@ -6,7 +6,7 @@ package com.boamfa.workout.classes;
 public class ExpandListChild {
 
     private int reps;
-    private Float weight;
+    private double weight;
 
     public int getReps() {
         return reps;
@@ -14,10 +14,10 @@ public class ExpandListChild {
     public void setReps(int reps) {
         this.reps = reps;
     }
-    public Float getWeight() {
+    public double getWeight() {
         return weight;
     }
-    public void setWeight(Float weight) {
+    public void setWeight(double weight) {
         this.weight = weight;
     }
 }

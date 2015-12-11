@@ -20,8 +20,13 @@ import com.boamfa.workout.utils.UserLocalStore;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by bogdan on 02/12/15.
@@ -102,7 +107,18 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
     @Override
     public void fillValues(int position, View convertView) {
         TextView textView = (TextView) convertView.findViewById(R.id.surface_text_view);
-        textView.setText(objects.get(position).date);
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        Date date = null;
+        try {
+            date = format.parse(objects.get(position).date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            // TODO Handle exception
+        }
+
+        DateFormat format2 = new SimpleDateFormat("dd MMMM, yyyy", Locale.US);
+        String newDate = format2.format(date);
+        textView.setText(newDate);
     }
 
     @Override

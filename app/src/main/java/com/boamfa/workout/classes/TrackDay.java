@@ -1,6 +1,7 @@
 package com.boamfa.workout.classes;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,5 +16,13 @@ public class TrackDay implements Serializable {
     public TrackDay(int id, String date) {
         this.id = id;
         this.date = date;
+    }
+
+    public void setItems(List<TrackDayExercise> exercises) {
+        this.exercises = exercises;
+    }
+
+    public void setItems() {
+        this.exercises = new ArrayList<TrackDayExercise>();
     }
 }

@@ -5,10 +5,10 @@ import java.util.ArrayList;
 /**
  * Created by bogdan on 30/11/15.
  */
-public class ExpandListGroup {
+public class ExpandListExercise {
 
     private String name;
-    private ArrayList<ExpandListChild> sets;
+    private ArrayList<ExpandListSet> sets;
 
     public String getName() {
         return name;
@@ -16,10 +16,10 @@ public class ExpandListGroup {
     public void setName(String name) {
         this.name = name;
     }
-    public ArrayList<ExpandListChild> getItems() {
+    public ArrayList<ExpandListSet> getItems() {
         return sets;
     }
-    public void setItems(ArrayList<ExpandListChild> Items) {
+    public void setItems(ArrayList<ExpandListSet> Items) {
         this.sets = Items;
     }
 }

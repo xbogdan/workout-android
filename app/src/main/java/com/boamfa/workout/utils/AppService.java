@@ -112,4 +112,38 @@ public class AppService {
 
         return response;
     }
+
+    public Pair<Integer, String> createTrackDay(String token, int trackId, String date) {
+        HashMap<String, String> postParams = new HashMap<String, String>();
+        postParams.put("track_id", trackId + "");
+        postParams.put("date", date);
+
+        HashMap<String, String> requestHeaders = new HashMap<String, String>();
+        requestHeaders.put("withCredentials", "true");
+        requestHeaders.put("Authorization", token);
+
+        Pair<Integer, String> response = null;
+        try {
+            response = httpConn.sendRequest(endPoint + "/createTrackDay", "POST", postParams, requestHeaders);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    public Pair<Integer, String> deleteTrackDay(String token, int trackId, int dayId) {
+        HashMap<String, String> requestHeaders = new HashMap<String, String>();
+        requestHeaders.put("withCredentials", "true");
+        requestHeaders.put("Authorization", token);
+
+        Pair<Integer, String> response = null;
+        try {
+            response = httpConn.sendRequest(endPoint + "/deleteTrackDay?track_id=" + trackId + "&day_id=" + dayId, "DELETE", null, requestHeaders);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
 }

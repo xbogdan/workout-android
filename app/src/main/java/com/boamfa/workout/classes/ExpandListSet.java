@@ -3,7 +3,7 @@ package com.boamfa.workout.classes;
 /**
  * Created by bogdan on 30/11/15.
  */
-public class ExpandListChild {
+public class ExpandListSet {
 
     private int reps;
     private double weight;

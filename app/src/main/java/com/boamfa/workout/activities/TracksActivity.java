@@ -77,8 +77,7 @@ public class TracksActivity extends BaseActivity {
         });
 
         tracksListView = (ListView) findViewById(R.id.tracksList);
-        MainTask task = new MainTask();
-        task.execute();
+        (new MainTask()).execute();
     }
 
     @Override
@@ -86,92 +85,76 @@ public class TracksActivity extends BaseActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    public void fillListView(Pair<Integer, String> response) {
-        if (response == null) {
-            userLocalStore.clearUserData();
-            // TODO: Network error
-        } else {
-            switch (response.first) {
-                case 200:
-                    JSONObject jsonResponse = null;
+    private void createTrackList(String json) {
+        JSONObject jsonResponse = null;
+        try {
+            jsonResponse = new JSONObject(json);
+            final JSONArray tracks = jsonResponse.getJSONArray("tracks");
+
+            trackList = new ArrayList<Track>();
+            for (int i = 0, size1 = tracks.length(); i < size1; i++) {
+                JSONObject trackObj = tracks.getJSONObject(i);
+                Track track = new Track(trackObj.getInt("id"), trackObj.getString("name"));
+                track.days = new ArrayList<TrackDay>();
+                trackList.add(track);
+
+                // days
+                JSONArray days;
+                try {
+                    days = trackObj.getJSONArray("track_days_attributes");
+                } catch (JSONException e) {
+                    continue;
+                }
+                for (int j = 0, size2 = days.length(); j < size2; j++) {
+                    JSONObject trackDayObj = days.getJSONObject(j);
+                    TrackDay trackDay = new TrackDay(trackDayObj.getInt("id"), trackDayObj.getString("date"));
+                    trackDay.exercises = new ArrayList<TrackDayExercise>();
+                    track.days.add(trackDay);
+
+                    // exercises
+                    JSONArray exercises;
                     try {
-                        jsonResponse = new JSONObject(response.second);
-                        final JSONArray tracks = jsonResponse.getJSONArray("tracks");
-
-                        trackList = new ArrayList<Track>();
-                        for (int i = 0, size1 = tracks.length(); i < size1; i++) {
-                            JSONObject trackObj = tracks.getJSONObject(i);
-                            Track track = new Track(trackObj.getInt("id"), trackObj.getString("name"));
-                            track.days = new ArrayList<TrackDay>();
-                            trackList.add(track);
-
-                            // days
-                            JSONArray days;
-                            try {
-                                days = trackObj.getJSONArray("track_days_attributes");
-                            } catch (JSONException e) {
-                                continue;
-                            }
-                            for (int j = 0, size2 = days.length(); j < size2; j++) {
-                                JSONObject trackDayObj = days.getJSONObject(j);
-                                TrackDay trackDay = new TrackDay(trackDayObj.getInt("id"), trackDayObj.getString("date"));
-                                trackDay.exercises = new ArrayList<TrackDayExercise>();
-                                track.days.add(trackDay);
-
-                                // exercises
-                                JSONArray exercises;
-                                try {
-                                    exercises = trackDayObj.getJSONArray("track_day_exercises_attributes");
-                                } catch (JSONException e) {
-                                    continue;
-                                }
-                                for (int k = 0, size3 = exercises.length(); k < size3; k++) {
-                                    JSONObject trackDayExerciseObj = exercises.getJSONObject(k);
-                                    TrackDayExercise trackDayExercise = new TrackDayExercise(trackDayExerciseObj.getInt("id"), trackDayExerciseObj.getString("name"));
-                                    trackDayExercise.sets = new ArrayList<TrackDayExerciseSet>();
-                                    trackDay.exercises.add(trackDayExercise);
-
-                                    //sets
-                                    JSONArray sets;
-                                    try {
-                                        sets = trackDayExerciseObj.getJSONArray("track_day_exercise_sets_attributes");
-                                    } catch (JSONException e) {
-                                        continue;
-                                    }
-                                    for (int l = 0, size4 = sets.length(); l < size4; l++) {
-                                        JSONObject trackDayExerciseSetObj = sets.getJSONObject(l);
-                                        TrackDayExerciseSet trackDayExerciseSet = new TrackDayExerciseSet(trackDayExerciseSetObj.getInt("id"), trackDayExerciseSetObj.getInt("reps"), trackDayExerciseSetObj.getDouble("weight"));
-                                        trackDayExercise.sets.add(trackDayExerciseSet);
-                                    }
-                                }
-                            }
-                        }
-
-                        tracksListAdapter = new TracksSwipeAdapter(this, R.layout.tracks_item, R.id.swipe, trackList);
-
-                        tracksListView.setAdapter(tracksListAdapter);
-                        tracksListView.setClickable(true);
-                        tracksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                Track tr = trackList.get(position);
-                                Intent i = new Intent(TracksActivity.this, TrackActivity.class);
-                                i.putExtra("track", tr);
-                                startActivity(i);
-                            }
-                        });
+                        exercises = trackDayObj.getJSONArray("track_day_exercises_attributes");
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        continue;
                     }
-                    break;
-                case 401:
-                    userLocalStore.clearUserData();
-                    Intent i = new Intent(TracksActivity.this, LoginActivity.class);
-                    startActivity(i);
-                    break;
-                default:
-                    // TODO: Handle the rest of the errors
+                    for (int k = 0, size3 = exercises.length(); k < size3; k++) {
+                        JSONObject trackDayExerciseObj = exercises.getJSONObject(k);
+                        TrackDayExercise trackDayExercise = new TrackDayExercise(trackDayExerciseObj.getInt("id"), trackDayExerciseObj.getString("name"));
+                        trackDayExercise.sets = new ArrayList<TrackDayExerciseSet>();
+                        trackDay.exercises.add(trackDayExercise);
+
+                        //sets
+                        JSONArray sets;
+                        try {
+                            sets = trackDayExerciseObj.getJSONArray("track_day_exercise_sets_attributes");
+                        } catch (JSONException e) {
+                            continue;
+                        }
+                        for (int l = 0, size4 = sets.length(); l < size4; l++) {
+                            JSONObject trackDayExerciseSetObj = sets.getJSONObject(l);
+                            TrackDayExerciseSet trackDayExerciseSet = new TrackDayExerciseSet(trackDayExerciseSetObj.getInt("id"), trackDayExerciseSetObj.getInt("reps"), trackDayExerciseSetObj.getDouble("weight"));
+                            trackDayExercise.sets.add(trackDayExerciseSet);
+                        }
+                    }
+                }
             }
+
+            tracksListAdapter = new TracksSwipeAdapter(this, R.layout.tracks_item, R.id.swipe, trackList);
+
+            tracksListView.setAdapter(tracksListAdapter);
+            tracksListView.setClickable(true);
+            tracksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Track tr = trackList.get(position);
+                    Intent i = new Intent(TracksActivity.this, TrackActivity.class);
+                    i.putExtra("track", tr);
+                    startActivity(i);
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -187,7 +170,23 @@ public class TracksActivity extends BaseActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-                fillListView(this.response);
+                if (response == null) {
+                    userLocalStore.clearUserData();
+                    // TODO: Network error
+                } else {
+                    switch (response.first) {
+                        case 200:
+                            createTrackList(response.second);
+                            break;
+                        case 401:
+                            userLocalStore.clearUserData();
+                            Intent i = new Intent(TracksActivity.this, LoginActivity.class);
+                            startActivity(i);
+                            break;
+                        default:
+                            // TODO: Handle the rest of the errors
+                    }
+                }
             } else {
                 // TODO: task failed
             }
@@ -211,14 +210,26 @@ public class TracksActivity extends BaseActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-                try {
-                    JSONObject jsonResponse = new JSONObject(response.second);
-                    int trackId = jsonResponse.getInt("track_id");
-                    trackList.add(new Track(trackId, trackName));
-                    tracksListAdapter.notifyDataSetChanged();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                switch (response.first) {
+                    case 201:
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response.second);
+                            int trackId = jsonResponse.getInt("track_id");
+                            trackList.add(new Track(trackId, trackName));
+                            tracksListAdapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case 401:
+                        userLocalStore.clearUserData();
+                        Intent i = new Intent(TracksActivity.this, LoginActivity.class);
+                        startActivity(i);
+                        break;
+                    default:
+                        break;
                 }
+
             } else {
                 // TODO: task failed
             }

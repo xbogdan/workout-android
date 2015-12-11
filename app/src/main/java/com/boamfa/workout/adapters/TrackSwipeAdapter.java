@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.boamfa.workout.R;
-import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.classes.TrackDay;
 import com.boamfa.workout.utils.AppService;
 import com.boamfa.workout.utils.User;
@@ -24,7 +23,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,9 +33,11 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
     private Context context;
     private List<TrackDay> objects;
     private int resource;
+    private int trackId;
     private int textViewResourceId;
 
-    public TrackSwipeAdapter(Context context, int resource, int textViewResourceId, List<TrackDay> objects) {
+    public TrackSwipeAdapter(Context context, int resource, int textViewResourceId, int trackId, List<TrackDay> objects) {
+        this.trackId = trackId;
         this.context = context;
         this.objects = objects;
         this.resource = resource;
@@ -61,7 +61,7 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
             public void onClick(View view) {
                 swipeLayout.close(false);
 
-                DeleteTrackTask task = new DeleteTrackTask(objects.get(position).id);
+                DeleteTask task = new DeleteTask(trackId, objects.get(position).id);
                 task.execute();
 
                 objects.remove(position);
@@ -137,26 +137,36 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
     }
 
 
-    public class DeleteTrackTask extends AsyncTask<Void, Void, Boolean> {
+    public class DeleteTask extends AsyncTask<Void, Void, Boolean> {
         private Pair<Integer, String> response;
         private int trackId;
+        private int trackDayId;
 
-        public DeleteTrackTask(int trackId) {
+        public DeleteTask(int trackId, int trackDayId) {
             this.trackId = trackId;
+            this.trackDayId = trackDayId;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-//            AppService service = new AppService();
-//            UserLocalStore userLocalStore = new UserLocalStore(context);
-//            User currentUser = userLocalStore.getLoggedInUser();
-//            response = service.deleteTrack(currentUser.auth_token, trackId);
+            AppService service = new AppService();
+            UserLocalStore userLocalStore = new UserLocalStore(context);
+            User currentUser = userLocalStore.getLoggedInUser();
+            response = service.deleteTrackDay(currentUser.auth_token, trackId, trackDayId);
             return true;
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
+                switch (response.first) {
+                    case 200:
+                        break;
+                    case 401:
+                        break;
+                    default:
+                        break;
+                }
             } else {
                 // TODO: task failed
             }
@@ -179,7 +189,7 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
 //            UserLocalStore userLocalStore = new UserLocalStore(context);
 //            User currentUser = userLocalStore.getLoggedInUser();
 //            HashMap<String, String> postParams = new HashMap<String, String>();
-//            postParams.put("track[id]", trackId + "");
+//            postParams.put("track[id]", trackDayId + "");
 //            postParams.put("track[name]",trackName);
 //            response = service.updateTrack(currentUser.auth_token, postParams);
             return true;

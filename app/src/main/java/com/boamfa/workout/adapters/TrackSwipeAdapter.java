@@ -8,10 +8,13 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.boamfa.workout.R;
+import com.boamfa.workout.activities.BaseActivity;
+import com.boamfa.workout.classes.AppTask;
 import com.boamfa.workout.classes.TrackDay;
 import com.boamfa.workout.utils.AppService;
 import com.boamfa.workout.utils.User;
@@ -30,7 +33,7 @@ import java.util.Locale;
  * Created by bogdan on 02/12/15.
  */
 public class TrackSwipeAdapter extends BaseSwipeAdapter {
-    private Context context;
+    private BaseActivity context;
     private List<TrackDay> objects;
     private int resource;
     private int trackId;
@@ -38,7 +41,7 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
 
     public TrackSwipeAdapter(Context context, int resource, int textViewResourceId, int trackId, List<TrackDay> objects) {
         this.trackId = trackId;
-        this.context = context;
+        this.context = (BaseActivity) context;
         this.objects = objects;
         this.resource = resource;
         this.textViewResourceId = textViewResourceId;
@@ -86,10 +89,8 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String m_Text = input.getText().toString();
-                        (new UpdateTrackNameTask(objects.get(position).id, m_Text)).execute();
-                        objects.get(position).name = m_Text;
-                        notifyDataSetChanged();
+//                        String m_Text = input.getText().toString();
+//                        notifyDataSetChanged();
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -136,71 +137,25 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
         return position;
     }
 
-
-    public class DeleteTask extends AsyncTask<Void, Void, Boolean> {
-        private Pair<Integer, String> response;
+    public class DeleteTask extends AppTask {
         private int trackId;
         private int trackDayId;
 
         public DeleteTask(int trackId, int trackDayId) {
+            super(context, context.userLocalStore);
             this.trackId = trackId;
             this.trackDayId = trackDayId;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            AppService service = new AppService();
-            UserLocalStore userLocalStore = new UserLocalStore(context);
-            User currentUser = userLocalStore.getLoggedInUser();
-            response = service.deleteTrackDay(currentUser.auth_token, trackId, trackDayId);
+            response = context.service.deleteTrackDay(context.currentUser.auth_token, trackId, trackDayId);
             return true;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
-            if (success) {
-                switch (response.first) {
-                    case 200:
-                        break;
-                    case 401:
-                        break;
-                    default:
-                        break;
-                }
-            } else {
-                // TODO: task failed
-            }
-        }
-    }
+        public void onSuccess(String response) {
 
-    public class UpdateTrackNameTask extends AsyncTask<Void, Void, Boolean> {
-        private Pair<Integer, String> response;
-        private int trackId;
-        private String trackName;
-
-        public UpdateTrackNameTask(int trackId, String trackName) {
-            this.trackId = trackId;
-            this.trackName = trackName;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-//            AppService service = new AppService();
-//            UserLocalStore userLocalStore = new UserLocalStore(context);
-//            User currentUser = userLocalStore.getLoggedInUser();
-//            HashMap<String, String> postParams = new HashMap<String, String>();
-//            postParams.put("track[id]", trackDayId + "");
-//            postParams.put("track[name]",trackName);
-//            response = service.updateTrack(currentUser.auth_token, postParams);
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            if (success) {
-            } else {
-                // TODO: task failed
-            }
         }
     }
 }

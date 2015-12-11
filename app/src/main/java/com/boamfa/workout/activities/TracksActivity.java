@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -63,7 +62,7 @@ public class TracksActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String m_Text = input.getText().toString();
-                        (new CreateTrackTask(m_Text)).execute();
+                        (new CreateTask(m_Text)).execute();
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -159,8 +158,6 @@ public class TracksActivity extends BaseActivity {
     }
 
     public class MainTask extends AppTask {
-        private Pair<Integer, String> response;
-
         public MainTask() {
             super(TracksActivity.this, userLocalStore);
         }
@@ -177,10 +174,10 @@ public class TracksActivity extends BaseActivity {
         }
     }
 
-    public class CreateTrackTask extends AppTask {
+    public class CreateTask extends AppTask {
         private String trackName;
 
-        public CreateTrackTask(String trackName) {
+        public CreateTask(String trackName) {
             super(TracksActivity.this, userLocalStore);
             this.trackName = trackName;
         }

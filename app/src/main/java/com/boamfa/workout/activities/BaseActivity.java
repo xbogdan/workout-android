@@ -26,9 +26,9 @@ public class BaseActivity extends AppCompatActivity {
     protected ActionBarDrawerToggle drawerListener;
     protected ListView listView;
     protected DrawerAdapter drawerAdapter;
-    protected AppService service;
-    protected User currentUser;
-    protected UserLocalStore userLocalStore;
+    public AppService service;
+    public User currentUser;
+    public UserLocalStore userLocalStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,6 +1,7 @@
 package com.boamfa.workout.classes;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,5 +15,14 @@ public class Track implements Serializable {
     public Track(int id, String name) {
         this.id = id;
         this.name = name;
+        this.setItems();
+    }
+
+    public void setItems(List<TrackDay> days) {
+        this.days = days;
+    }
+
+    public void setItems() {
+        this.days = new ArrayList<TrackDay>();
     }
 }

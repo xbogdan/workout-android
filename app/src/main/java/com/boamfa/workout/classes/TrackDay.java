@@ -16,6 +16,7 @@ public class TrackDay implements Serializable {
     public TrackDay(int id, String date) {
         this.id = id;
         this.date = date;
+        this.setItems();
     }
 
     public void setItems(List<TrackDayExercise> exercises) {

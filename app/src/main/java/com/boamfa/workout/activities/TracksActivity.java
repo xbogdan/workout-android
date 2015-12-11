@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Pair;
@@ -18,6 +17,7 @@ import android.widget.ListView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.TracksSwipeAdapter;
+import com.boamfa.workout.classes.AppTask;
 import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.classes.TrackDay;
 import com.boamfa.workout.classes.TrackDayExercise;
@@ -95,7 +95,7 @@ public class TracksActivity extends BaseActivity {
             for (int i = 0, size1 = tracks.length(); i < size1; i++) {
                 JSONObject trackObj = tracks.getJSONObject(i);
                 Track track = new Track(trackObj.getInt("id"), trackObj.getString("name"));
-                track.days = new ArrayList<TrackDay>();
+//                track.days = new ArrayList<TrackDay>();
                 trackList.add(track);
 
                 // days
@@ -108,7 +108,7 @@ public class TracksActivity extends BaseActivity {
                 for (int j = 0, size2 = days.length(); j < size2; j++) {
                     JSONObject trackDayObj = days.getJSONObject(j);
                     TrackDay trackDay = new TrackDay(trackDayObj.getInt("id"), trackDayObj.getString("date"));
-                    trackDay.exercises = new ArrayList<TrackDayExercise>();
+//                    trackDay.exercises = new ArrayList<TrackDayExercise>();
                     track.days.add(trackDay);
 
                     // exercises
@@ -121,7 +121,7 @@ public class TracksActivity extends BaseActivity {
                     for (int k = 0, size3 = exercises.length(); k < size3; k++) {
                         JSONObject trackDayExerciseObj = exercises.getJSONObject(k);
                         TrackDayExercise trackDayExercise = new TrackDayExercise(trackDayExerciseObj.getInt("id"), trackDayExerciseObj.getString("name"));
-                        trackDayExercise.sets = new ArrayList<TrackDayExerciseSet>();
+//                        trackDayExercise.sets = new ArrayList<TrackDayExerciseSet>();
                         trackDay.exercises.add(trackDayExercise);
 
                         //sets
@@ -158,8 +158,12 @@ public class TracksActivity extends BaseActivity {
         }
     }
 
-    public class MainTask extends AsyncTask<Void, Void, Boolean> {
+    public class MainTask extends AppTask {
         private Pair<Integer, String> response;
+
+        public MainTask() {
+            super(TracksActivity.this, userLocalStore);
+        }
 
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -168,36 +172,16 @@ public class TracksActivity extends BaseActivity {
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
-            if (success) {
-                if (response == null) {
-                    userLocalStore.clearUserData();
-                    // TODO: Network error
-                } else {
-                    switch (response.first) {
-                        case 200:
-                            createTrackList(response.second);
-                            break;
-                        case 401:
-                            userLocalStore.clearUserData();
-                            Intent i = new Intent(TracksActivity.this, LoginActivity.class);
-                            startActivity(i);
-                            break;
-                        default:
-                            // TODO: Handle the rest of the errors
-                    }
-                }
-            } else {
-                // TODO: task failed
-            }
+        public void onSuccess(String response) {
+            createTrackList(response);
         }
     }
 
-    public class CreateTrackTask extends AsyncTask<Void, Void, Boolean> {
-        private Pair<Integer, String> response;
+    public class CreateTrackTask extends AppTask {
         private String trackName;
 
         public CreateTrackTask(String trackName) {
+            super(TracksActivity.this, userLocalStore);
             this.trackName = trackName;
         }
 
@@ -208,30 +192,14 @@ public class TracksActivity extends BaseActivity {
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
-            if (success) {
-                switch (response.first) {
-                    case 201:
-                        try {
-                            JSONObject jsonResponse = new JSONObject(response.second);
-                            int trackId = jsonResponse.getInt("track_id");
-                            trackList.add(new Track(trackId, trackName));
-                            tracksListAdapter.notifyDataSetChanged();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case 401:
-                        userLocalStore.clearUserData();
-                        Intent i = new Intent(TracksActivity.this, LoginActivity.class);
-                        startActivity(i);
-                        break;
-                    default:
-                        break;
-                }
-
-            } else {
-                // TODO: task failed
+        public void onSuccess(String response) {
+            try {
+                JSONObject jsonResponse = new JSONObject(response);
+                int trackId = jsonResponse.getInt("track_id");
+                trackList.add(new Track(trackId, trackName));
+                tracksListAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
     }

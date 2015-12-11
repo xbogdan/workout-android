@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -17,6 +15,7 @@ import android.widget.ListView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.TrackSwipeAdapter;
+import com.boamfa.workout.classes.AppTask;
 import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.classes.TrackDay;
 
@@ -49,28 +48,28 @@ public class TrackActivity extends BaseActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            final Calendar myCalendar = Calendar.getInstance();
+                final Calendar myCalendar = Calendar.getInstance();
 
-            DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-                @Override
-                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                myCalendar.set(Calendar.YEAR, year);
-                myCalendar.set(Calendar.MONTH, monthOfYear);
-                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-                String newDate = format.format(myCalendar.getTime());
-                (new CreateTrackDayTask(newDate)).execute();
-                }
+                DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        myCalendar.set(Calendar.YEAR, year);
+                        myCalendar.set(Calendar.MONTH, monthOfYear);
+                        myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                        String newDate = format.format(myCalendar.getTime());
+                        (new CreateTrackDayTask(newDate)).execute();
+                    }
 
-            };
+                };
 
-            new DatePickerDialog(
-                self,
-                date,
-                myCalendar.get(Calendar.YEAR),
-                myCalendar.get(Calendar.MONTH),
-                myCalendar.get(Calendar.DAY_OF_MONTH)
-            ).show();
+                new DatePickerDialog(
+                        self,
+                        date,
+                        myCalendar.get(Calendar.YEAR),
+                        myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH)
+                ).show();
             }
         });
 
@@ -94,54 +93,34 @@ public class TrackActivity extends BaseActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    public class CreateTrackDayTask extends AsyncTask<Void, Void, Boolean> {
-        private Pair<Integer, String> response;
+    public class CreateTrackDayTask extends AppTask {
         private String date;
 
         public CreateTrackDayTask(String date) {
+            super(TrackActivity.this, userLocalStore);
             this.date = date;
+        }
+
+        @Override
+        public void onSuccess(String response) {
+            try {
+                JSONObject jsonResponse = new JSONObject(response);
+                int trackDayId = jsonResponse.getInt("day_id");
+
+                TrackDay newTrackDay = new TrackDay(trackDayId, date);
+                newTrackDay.setItems();
+
+                track.days.add(newTrackDay);
+                trackDaysListAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             response = service.createTrackDay(currentUser.auth_token, track.id, date);
             return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            if (success) {
-                if (response == null) {
-                    userLocalStore.clearUserData();
-                    // TODO: Network error
-                } else {
-                    switch (response.first) {
-                        case 201:
-                            try {
-                                JSONObject jsonResponse = new JSONObject(response.second);
-                                int trackDayId = jsonResponse.getInt("day_id");
-
-                                TrackDay newTrackDay = new TrackDay(trackDayId, date);
-                                newTrackDay.setItems();
-
-                                track.days.add(newTrackDay);
-                                trackDaysListAdapter.notifyDataSetChanged();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            break;
-                        case 401:
-                            userLocalStore.clearUserData();
-                            Intent i = new Intent(TrackActivity.this, LoginActivity.class);
-                            startActivity(i);
-                            break;
-                        default:
-                            // TODO: Handle the rest of the errors
-                    }
-                }
-            } else {
-                // TODO: task failed
-            }
         }
     }
 }

@@ -17,8 +17,6 @@ import java.util.ArrayList;
 
 public class TrackDaysActivity extends BaseActivity {
 
-    private final Activity self = this;
-
     private ExpandableListView ExpandList;
     private ExpandListAdapter ExpAdapter;
     private ArrayList<ExpandListExercise> ExpListItems;
@@ -52,7 +50,7 @@ public class TrackDaysActivity extends BaseActivity {
             ExpListItems.add(exercise);
         }
 
-        ExpAdapter = new ExpandListAdapter(self, ExpListItems);
+        ExpAdapter = new ExpandListAdapter(TrackDaysActivity.this, ExpListItems);
 
         ExpandList = (ExpandableListView) findViewById(R.id.expandableList);
         ExpandList.setAdapter(ExpAdapter);

@@ -1,6 +1,7 @@
 package com.boamfa.workout.adapters;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
@@ -9,12 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.activities.BaseActivity;
 import com.boamfa.workout.classes.AppTask;
+import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.classes.TrackDay;
 import com.boamfa.workout.utils.AppService;
 import com.boamfa.workout.utils.User;
@@ -25,7 +28,9 @@ import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -75,31 +80,27 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
             @Override
             public void onClick(View view) {
                 swipeLayout.close(false);
+                final Calendar myCalendar = Calendar.getInstance();
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Track name");
-
-                // Set up the input
-                final EditText input = new EditText(context);
-                input.setTextColor(context.getResources().getColor(R.color.black));
-                input.setText(objects.get(position).name);
-                builder.setView(input);
-
-                // Set up the buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-//                        String m_Text = input.getText().toString();
-//                        notifyDataSetChanged();
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        myCalendar.set(Calendar.YEAR, year);
+                        myCalendar.set(Calendar.MONTH, monthOfYear);
+                        myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                        String newDate = format.format(myCalendar.getTime());
+                        (new UpdateTask(trackId, objects.get(position), newDate)).execute();
                     }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-                builder.show();
+                };
+
+                new DatePickerDialog(
+                        context,
+                        date,
+                        myCalendar.get(Calendar.YEAR),
+                        myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH)
+                ).show();
             }
         });
         return v;
@@ -156,6 +157,37 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
         @Override
         public void onSuccess(String response) {
 
+        }
+    }
+
+    public class UpdateTask extends AppTask {
+        private String date;
+        private int trackId;
+        private TrackDay trackDay;
+
+        public UpdateTask(int trackId, TrackDay trackDay, String date) {
+            super(context, context.userLocalStore);
+            this.date = date;
+            this.trackId = trackId;
+            this.trackDay = trackDay;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            HashMap<String, String> postParams = new HashMap<String, String>();
+            postParams.put("track[id]", trackId + "");
+            postParams.put("track[track_days_attributes[][id]]", trackDay.id + "");
+            postParams.put("track[track_days_attributes[][date]]", date);
+            postParams.put("track[track_days_attributes[][track_id]]", trackId + "");
+
+            response = context.service.updateTrack(context.currentUser.auth_token, postParams);
+            return true;
+        }
+
+        @Override
+        public void onSuccess(String response) {
+            trackDay.date = date;
+            notifyDataSetChanged();
         }
     }
 }

@@ -8,6 +8,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
 import com.boamfa.workout.R;
+import com.boamfa.workout.activities.BaseActivity;
 import com.boamfa.workout.classes.ExpandListExercise;
 import com.boamfa.workout.classes.ExpandListSet;
 import com.daimajia.swipe.SwipeLayout;
@@ -19,10 +20,10 @@ import java.util.ArrayList;
  */
 public class ExpandListAdapter extends BaseExpandableListAdapter {
 
-    private Context context;
+    private BaseActivity context;
     private ArrayList<ExpandListExercise> groups;
     public ExpandListAdapter(Context context, ArrayList<ExpandListExercise> groups) {
-        this.context = context;
+        this.context = (BaseActivity) context;
         this.groups = groups;
     }
 

@@ -37,7 +37,9 @@ public class TrackActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        track = (Track) getIntent().getSerializableExtra("track");
+        final int trackIndex = getIntent().getIntExtra("track_index", -1);
+
+        track = trackList.get(trackIndex);
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View contentView = inflater.inflate(R.layout.activity_track, null, false);
@@ -82,7 +84,8 @@ public class TrackActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(TrackActivity.this, TrackDaysActivity.class);
-                i.putExtra("day", track.days.get(position));
+                i.putExtra("track_index", trackIndex);
+                i.putExtra("day_index", position);
                 startActivity(i);
             }
         });

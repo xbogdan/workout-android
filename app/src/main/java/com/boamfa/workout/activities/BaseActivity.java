@@ -13,22 +13,26 @@ import android.widget.ListView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.DrawerAdapter;
+import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.utils.AppService;
 import com.boamfa.workout.utils.User;
 import com.boamfa.workout.utils.UserLocalStore;
+
+import java.util.List;
 
 /**
  * Created by bogdan on 25/11/15.
  */
 public class BaseActivity extends AppCompatActivity {
 
-    protected DrawerLayout drawerLayout;
-    protected ActionBarDrawerToggle drawerListener;
-    protected ListView listView;
-    protected DrawerAdapter drawerAdapter;
-    public AppService service;
-    public User currentUser;
-    public UserLocalStore userLocalStore;
+    protected static DrawerLayout drawerLayout;
+    protected static ActionBarDrawerToggle drawerListener;
+    protected static ListView listView;
+    protected static DrawerAdapter drawerAdapter;
+    public static AppService service;
+    public static User currentUser;
+    public static UserLocalStore userLocalStore;
+    protected static List<Track> trackList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

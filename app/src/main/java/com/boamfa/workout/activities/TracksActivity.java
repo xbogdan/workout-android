@@ -32,7 +32,7 @@ import java.util.List;
 public class TracksActivity extends BaseActivity {
 
     private ListView tracksListView;
-    private List<Track> trackList;
+//    private List<Track> trackList;
     private TracksSwipeAdapter tracksListAdapter;
     private final Activity self = this;
 
@@ -86,11 +86,11 @@ public class TracksActivity extends BaseActivity {
 
     private void createTrackList(String json) {
         JSONObject jsonResponse = null;
+        trackList = new ArrayList<Track>();
         try {
             jsonResponse = new JSONObject(json);
             final JSONArray tracks = jsonResponse.getJSONArray("tracks");
 
-            trackList = new ArrayList<Track>();
             for (int i = 0, size1 = tracks.length(); i < size1; i++) {
                 JSONObject trackObj = tracks.getJSONObject(i);
                 Track track = new Track(trackObj.getInt("id"), trackObj.getString("name"));
@@ -146,9 +146,8 @@ public class TracksActivity extends BaseActivity {
             tracksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Track tr = trackList.get(position);
                     Intent i = new Intent(TracksActivity.this, TrackActivity.class);
-                    i.putExtra("track", tr);
+                    i.putExtra("track_index", position);
                     startActivity(i);
                 }
             });

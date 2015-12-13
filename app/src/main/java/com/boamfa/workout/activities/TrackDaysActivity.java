@@ -30,9 +30,10 @@ public class TrackDaysActivity extends BaseActivity {
         View contentView = inflater.inflate(R.layout.activity_track_days, null, false);
         drawerLayout.addView(contentView, 0);
 
+        int trackIndex = getIntent().getIntExtra("track_index", -1);
+        int dayIndex = getIntent().getIntExtra("day_index", -1);
 
-        day = (TrackDay) getIntent().getSerializableExtra("day");
-
+        day = trackList.get(trackIndex).days.get(dayIndex);
 
         ExpListItems = new ArrayList<ExpandListExercise>();
         for (int i = 0, size = day.exercises.size(); i < size; i++) {

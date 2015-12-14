@@ -29,9 +29,12 @@ public class BaseActivity extends AppCompatActivity {
     protected static ActionBarDrawerToggle drawerListener;
     protected static ListView listView;
     protected static DrawerAdapter drawerAdapter;
+
     public static AppService service;
+
     public static User currentUser;
     public static UserLocalStore userLocalStore;
+
     protected static List<Track> trackList;
 
     @Override

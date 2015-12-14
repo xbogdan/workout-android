@@ -180,4 +180,19 @@ public class AppService {
 
         return response;
     }
+
+    public Pair<Integer, String> deleteTrackDayExercise(String token, int trackDayExerciseId) {
+        HashMap<String, String> requestHeaders = new HashMap<String, String>();
+        requestHeaders.put("withCredentials", "true");
+        requestHeaders.put("Authorization", token);
+
+        Pair<Integer, String> response = null;
+        try {
+            response = httpConn.sendRequest(endPoint + "/deleteTrackDayExercise?id=" + trackDayExerciseId, "DELETE", null, requestHeaders);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
 }

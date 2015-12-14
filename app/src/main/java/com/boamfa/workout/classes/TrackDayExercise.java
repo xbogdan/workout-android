@@ -10,7 +10,7 @@ import java.util.List;
 public class TrackDayExercise implements Serializable {
     public int id;
     public String name;
-    public List<TrackDayExerciseSet> sets;
+    public ArrayList<TrackDayExerciseSet> sets;
 
     public TrackDayExercise(int id, String name) {
         this.id = id;
@@ -18,7 +18,7 @@ public class TrackDayExercise implements Serializable {
         this.setItems();
     }
 
-    public void setItems(List<TrackDayExerciseSet> sets) {
+    public void setItems(ArrayList<TrackDayExerciseSet> sets) {
         this.sets = sets;
     }
 

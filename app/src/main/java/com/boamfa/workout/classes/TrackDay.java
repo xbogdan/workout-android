@@ -11,7 +11,7 @@ public class TrackDay implements Serializable {
     public int id;
     public String name;
     public String date;
-    public List<TrackDayExercise> exercises;
+    public ArrayList<TrackDayExercise> exercises;
 
     public TrackDay(int id, String date) {
         this.id = id;
@@ -19,7 +19,7 @@ public class TrackDay implements Serializable {
         this.setItems();
     }
 
-    public void setItems(List<TrackDayExercise> exercises) {
+    public void setItems(ArrayList<TrackDayExercise> exercises) {
         this.exercises = exercises;
     }
 

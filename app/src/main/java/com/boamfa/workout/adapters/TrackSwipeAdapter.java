@@ -1,27 +1,17 @@
 package com.boamfa.workout.adapters;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.os.AsyncTask;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.activities.BaseActivity;
 import com.boamfa.workout.classes.AppTask;
-import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.classes.TrackDay;
-import com.boamfa.workout.utils.AppService;
-import com.boamfa.workout.utils.User;
-import com.boamfa.workout.utils.UserLocalStore;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 

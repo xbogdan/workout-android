@@ -10,6 +10,13 @@ public class ExpandListExercise {
     private String name;
     private ArrayList<ExpandListSet> sets;
 
+    public ExpandListExercise() {}
+
+    public ExpandListExercise(String name, ArrayList<ExpandListSet> sets) {
+        this.name = name;
+        this.sets = sets;
+    }
+
     public String getName() {
         return name;
     }

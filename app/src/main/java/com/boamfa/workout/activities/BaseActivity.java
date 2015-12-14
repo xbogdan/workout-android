@@ -15,8 +15,8 @@ import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.DrawerAdapter;
 import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.utils.AppService;
-import com.boamfa.workout.utils.User;
-import com.boamfa.workout.utils.UserLocalStore;
+import com.boamfa.workout.classes.User;
+import com.boamfa.workout.classes.UserLocalStore;
 
 import java.util.List;
 

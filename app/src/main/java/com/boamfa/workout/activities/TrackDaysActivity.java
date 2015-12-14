@@ -8,11 +8,11 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -25,6 +25,7 @@ import com.boamfa.workout.classes.Exercise;
 import com.boamfa.workout.classes.ExpandListExercise;
 import com.boamfa.workout.classes.ExpandListSet;
 import com.boamfa.workout.classes.TrackDay;
+import com.boamfa.workout.classes.TrackDayExercise;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +44,7 @@ public class TrackDaysActivity extends BaseActivity {
     private static boolean gotExercises = false;
     private ExercisesListAdapter exercisesListAdapter;
     private static ListView exercisesListView;
+    private PopupWindow exercisesPopup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +60,8 @@ public class TrackDaysActivity extends BaseActivity {
         day = trackList.get(trackIndex).days.get(dayIndex);
 
         // Exercise popup list
-        final PopupWindow exercisesPopup = new PopupWindow(drawerLayout, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, true);
-        RelativeLayout exercisesPopupBg = (RelativeLayout) inflater.inflate(R.layout.exercises_popup, null, false);
+        exercisesPopup = new PopupWindow(drawerLayout, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, true);
+        final RelativeLayout exercisesPopupBg = (RelativeLayout) inflater.inflate(R.layout.exercises_popup, null, false);
         exercisesPopupBg.getBackground().setAlpha(220);
         exercisesPopup.setFocusable(true);
         exercisesPopup.setContentView(exercisesPopupBg);
@@ -83,6 +85,14 @@ public class TrackDaysActivity extends BaseActivity {
         });
 
         exercisesListView = (ListView) exercisesPopupBg.findViewById(R.id.exercises_list);
+        exercisesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                exercisesPopup.dismiss();
+                Exercise selectedExercise = exercisesListAdapter.getItem(position);
+                (new CreateTask(day.id, selectedExercise)).execute();
+            }
+        });
 
         Button closeButton = (Button) exercisesPopupBg.findViewById(R.id.exercises_close);
         closeButton.setOnClickListener(new View.OnClickListener() {
@@ -137,7 +147,7 @@ public class TrackDaysActivity extends BaseActivity {
                 Exercise e = new Exercise(exerciseObj.getInt("id"), exerciseObj.getString("name"), exerciseObj.getInt("muscle_group_id"), exerciseObj.getString("muscle_group_name"));
                 exerciseList.add(e);
             }
-            exercisesListAdapter = new ExercisesListAdapter(TrackDaysActivity.this, exerciseList);
+            exercisesListAdapter = new ExercisesListAdapter(TrackDaysActivity.this, exerciseList, exercisesPopup);
             exercisesListView.setAdapter(exercisesListAdapter);
             exercisesListAdapter.notifyDataSetChanged();
             gotExercises = true;
@@ -160,6 +170,38 @@ public class TrackDaysActivity extends BaseActivity {
         @Override
         public void onSuccess(String response) {
             createExerciseList(response);
+        }
+    }
+
+    public class CreateTask extends AppTask {
+        int dayId;
+        Exercise exercise;
+
+        public CreateTask(int dayId, Exercise exercise) {
+            super(TrackDaysActivity.this, userLocalStore);
+            this.dayId = dayId;
+            this.exercise = exercise;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            response = service.createTrackDayExercise(currentUser.auth_token, dayId, exercise.id);
+            return true;
+        }
+
+        @Override
+        public void onSuccess(String response) {
+            ExpandListExercise expandListExercise = new ExpandListExercise(this.exercise.name, new ArrayList<ExpandListSet>());
+            ExpListItems.add(expandListExercise);
+            ExpAdapter.notifyDataSetChanged();
+            try {
+                JSONObject jsonResponse = new JSONObject(response);
+                int trackDayExerciseId = jsonResponse.getInt("track_day_exercise_id");
+                TrackDayExercise trackDayExercise = new TrackDayExercise(trackDayExerciseId, this.exercise.name);
+                day.exercises.add(trackDayExercise);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

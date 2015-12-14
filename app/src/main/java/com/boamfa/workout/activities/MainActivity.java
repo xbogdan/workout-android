@@ -7,8 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.boamfa.workout.R;
-import com.boamfa.workout.utils.User;
-import com.boamfa.workout.utils.UserLocalStore;
+import com.boamfa.workout.classes.User;
+import com.boamfa.workout.classes.UserLocalStore;
 
 public class MainActivity extends BaseActivity {
 

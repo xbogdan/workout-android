@@ -1,4 +1,4 @@
-package com.boamfa.workout.utils;
+package com.boamfa.workout.classes;
 
 /**
  * Created by bogdan on 25/11/15.

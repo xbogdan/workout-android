@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.boamfa.workout.R;
@@ -23,10 +24,12 @@ public class ExercisesListAdapter extends BaseAdapter implements Filterable {
     private List<Exercise> mObjects;
     private List<Exercise> mOriginalValues;
     private Context mContext;
+    private PopupWindow popupWindow;
 
-    public ExercisesListAdapter(Context context, List<Exercise> objects) {
+    public ExercisesListAdapter(Context context, List<Exercise> objects, PopupWindow popupWindow) {
         this.mObjects = objects;
         this.mContext = context;
+        this.popupWindow = popupWindow;
     }
 
     @Override

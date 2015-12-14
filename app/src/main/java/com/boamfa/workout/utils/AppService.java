@@ -161,4 +161,23 @@ public class AppService {
 
         return response;
     }
+
+    public Pair<Integer, String> createTrackDayExercise(String token, int dayId, int exerciseId) {
+        HashMap<String, String> postParams = new HashMap<String, String>();
+        postParams.put("day_id", dayId + "");
+        postParams.put("exercise_id", exerciseId + "");
+
+        HashMap<String, String> requestHeaders = new HashMap<String, String>();
+        requestHeaders.put("withCredentials", "true");
+        requestHeaders.put("Authorization", token);
+
+        Pair<Integer, String> response = null;
+        try {
+            response = httpConn.sendRequest(endPoint + "/createTrackDayExercise", "POST", postParams, requestHeaders);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
 }

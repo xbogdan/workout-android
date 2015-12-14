@@ -37,8 +37,8 @@ import java.util.List;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.utils.AppService;
-import com.boamfa.workout.utils.User;
-import com.boamfa.workout.utils.UserLocalStore;
+import com.boamfa.workout.classes.User;
+import com.boamfa.workout.classes.UserLocalStore;
 
 import org.json.JSONException;
 import org.json.JSONObject;

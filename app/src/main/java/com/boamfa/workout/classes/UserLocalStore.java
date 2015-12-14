@@ -1,4 +1,4 @@
-package com.boamfa.workout.utils;
+package com.boamfa.workout.classes;
 
 import android.content.Context;
 import android.content.SharedPreferences;

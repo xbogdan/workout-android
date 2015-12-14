@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.util.Pair;
 
 import com.boamfa.workout.activities.LoginActivity;
-import com.boamfa.workout.utils.UserLocalStore;
 
 /**
  * Created by bogdan on 11/12/15.

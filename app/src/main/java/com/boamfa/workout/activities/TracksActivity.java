@@ -32,7 +32,6 @@ import java.util.List;
 public class TracksActivity extends BaseActivity {
 
     private ListView tracksListView;
-//    private List<Track> trackList;
     private TracksSwipeAdapter tracksListAdapter;
     private final Activity self = this;
 

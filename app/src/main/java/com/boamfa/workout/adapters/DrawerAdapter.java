@@ -43,7 +43,7 @@ public class DrawerAdapter extends BaseAdapter {
         View row = null;
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            row = inflater.inflate(R.layout.custom_row, parent, false);
+            row = inflater.inflate(R.layout.drawer_item, parent, false);
         } else {
             row = convertView;
         }

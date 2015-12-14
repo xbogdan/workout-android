@@ -11,7 +11,7 @@ public class AppService {
 
     private static final String endPoint = "http://10.0.2.2:3000/api/v1";
 //    private static final String endPoint = "http://192.168.1.218:3000/api/v1";
-//    private static final String endPoint = "http://192.168.0.10:3000/api/v1";
+//    private static final String endPoint = "http://192.168.0.11:3000/api/v1";
     private static final HttpCaller httpConn = new HttpCaller(false);
 
     public AppService() {
@@ -140,6 +140,21 @@ public class AppService {
         Pair<Integer, String> response = null;
         try {
             response = httpConn.sendRequest(endPoint + "/deleteTrackDay?track_id=" + trackId + "&day_id=" + dayId, "DELETE", null, requestHeaders);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    public Pair<Integer, String> getExercises(String token) {
+        HashMap<String, String> requestHeaders = new HashMap<String, String>();
+        requestHeaders.put("withCredentials", "true");
+        requestHeaders.put("Authorization", token);
+
+        Pair<Integer, String> response = null;
+        try {
+            response = httpConn.sendRequest(endPoint + "/exercises", "GET", null, requestHeaders);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -20,13 +20,13 @@ import java.util.List;
 /**
  * Created by bogdan on 13/12/15.
  */
-public class ExercisesListAdapter extends BaseAdapter implements Filterable {
+public class ExercisesAdapter extends BaseAdapter implements Filterable {
     private List<Exercise> mObjects;
     private List<Exercise> mOriginalValues;
     private Context mContext;
     private PopupWindow popupWindow;
 
-    public ExercisesListAdapter(Context context, List<Exercise> objects, PopupWindow popupWindow) {
+    public ExercisesAdapter(Context context, List<Exercise> objects, PopupWindow popupWindow) {
         this.mObjects = objects;
         this.mContext = context;
         this.popupWindow = popupWindow;

@@ -18,11 +18,11 @@ import java.util.ArrayList;
 /**
  * Created by bogdan on 30/11/15.
  */
-public class ExpandListAdapter extends BaseExpandableListAdapter {
+public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
 
     private BaseActivity context;
     private ArrayList<ExpandListExercise> groups;
-    public ExpandListAdapter(Context context, ArrayList<ExpandListExercise> groups) {
+    public TrackDayExerciseAdapter(Context context, ArrayList<ExpandListExercise> groups) {
         this.context = (BaseActivity) context;
         this.groups = groups;
     }
@@ -62,7 +62,6 @@ public class ExpandListAdapter extends BaseExpandableListAdapter {
             @Override
             public void onClick(View view) {
                 swipeLayout.close(false);
-                System.out.println("============== TEST ITEM ==============");
             }
         });
 

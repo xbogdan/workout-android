@@ -1,41 +1,40 @@
 package com.boamfa.workout.adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.boamfa.workout.R;
-import com.boamfa.workout.activities.BaseActivity;
+import com.boamfa.workout.activities.InfoActivity;
 import com.boamfa.workout.classes.AppTask;
+import com.boamfa.workout.classes.Exercise;
 import com.boamfa.workout.classes.TrackDayExercise;
 import com.boamfa.workout.classes.TrackDayExerciseSet;
-import com.boamfa.workout.classes.User;
-import com.boamfa.workout.classes.UserLocalStore;
-import com.boamfa.workout.utils.AppService;
 import com.daimajia.swipe.SwipeLayout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by bogdan on 30/11/15.
  */
 public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
 
-    private BaseActivity context;
+    private InfoActivity context;
+    private Activity activity;
     private ArrayList<TrackDayExercise> groups;
-    private AppService service;
-    private User currentUser;
-    private UserLocalStore userLocalStore;
 
-    public TrackDayExerciseAdapter(Context context, ArrayList<TrackDayExercise> groups, AppService service, User currentUser, UserLocalStore userLocalStore) {
-        this.context = (BaseActivity) context;
+    public TrackDayExerciseAdapter(Context context, ArrayList<TrackDayExercise> groups) {
+        this.context = (InfoActivity) context;
+        this.activity = (Activity) context;
         this.groups = groups;
-        this.service = service;
-        this.currentUser = currentUser;
-        this.userLocalStore = userLocalStore;
     }
 
     public void addItem(TrackDayExerciseSet item, TrackDayExercise group) {
@@ -60,8 +59,8 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View view, ViewGroup parent) {
         TrackDayExerciseSet child = (TrackDayExerciseSet) getChild(groupPosition, childPosition);
         if (view == null) {
-            LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
-            view = infalInflater.inflate(R.layout.expandlist_set, null);
+            LayoutInflater inflater = (LayoutInflater) activity.getSystemService(activity.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.expandlist_set, null);
         }
 
         final SwipeLayout swipeLayout = (SwipeLayout) view.findViewById(R.id.swipe);
@@ -71,7 +70,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         view.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                swipeLayout.close(false);
+                swipeLayout.close(false);
 
             }
         });
@@ -104,8 +103,8 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
     public View getGroupView(final int groupPosition, boolean isLastChild, View view, ViewGroup parent) {
         TrackDayExercise group = (TrackDayExercise) getGroup(groupPosition);
         if (view == null) {
-            LayoutInflater inf = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
-            view = inf.inflate(R.layout.expandlist_exercise, null);
+            LayoutInflater inflater = (LayoutInflater) activity.getSystemService(activity.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.expandlist_exercise, null);
         }
 
         final SwipeLayout swipeLayout = (SwipeLayout) view.findViewById(R.id.swipe);
@@ -116,8 +115,26 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
             @Override
             public void onClick(View view) {
                 swipeLayout.close(false);
-                (new DeleteExerciseTask(groupPosition)).execute();
+                (new DeleteTrackDayExerciseTask(groupPosition)).execute();
+            }
+        });
 
+        view.findViewById(R.id.edit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                swipeLayout.close(false);
+                final PopupWindow exercisesPopup = context.getExercisePopup();
+                exercisesPopup.showAtLocation(context.getLayout(), Gravity.CENTER, 0, 0);
+                context.getExerciseListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        exercisesPopup.dismiss();
+                        Exercise selectedExercise = context.getExerciseAdapter().getItem(position);
+                        groups.get(groupPosition).name = selectedExercise.name;
+                        notifyDataSetChanged();
+                        (new UpdateTrackDayExerciseTask(groupPosition, selectedExercise.id)).execute();
+                    }
+                });
             }
         });
 
@@ -137,17 +154,17 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    public class DeleteExerciseTask extends AppTask {
+    public class DeleteTrackDayExerciseTask extends AppTask {
         int position;
 
-        public DeleteExerciseTask(int position) {
-            super(context, userLocalStore);
+        public DeleteTrackDayExerciseTask(int position) {
+            super((Context) context, context.getUserLocalStore());
             this.position = position;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = service.deleteTrackDayExercise(currentUser.auth_token, groups.get(position).id);
+            response = context.getService().deleteTrackDayExercise(context.getCurrentUser().auth_token, groups.get(position).id);
             return true;
         }
 
@@ -155,6 +172,30 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         public void onSuccess(String response) {
             groups.remove(position);
             notifyDataSetChanged();
+        }
+    }
+
+    public class UpdateTrackDayExerciseTask extends AppTask {
+        int position;
+        int exercise_id;
+
+        public UpdateTrackDayExerciseTask(int position, int exercise_id) {
+            super((Context) context, context.getUserLocalStore());
+            this.position = position;
+            this.exercise_id = exercise_id;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            HashMap<String, String> postParams = new HashMap<String, String>();
+            postParams.put("id", groups.get(position).id + "");
+            postParams.put("exercise_id", exercise_id + "");
+            response = context.getService().updateTrackDayExercise(context.getCurrentUser().auth_token, postParams);
+            return true;
+        }
+
+        @Override
+        public void onSuccess(String response) {
         }
     }
 

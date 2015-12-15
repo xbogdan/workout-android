@@ -9,9 +9,9 @@ import java.util.HashMap;
  */
 public class AppService {
 
-    private static final String endPoint = "http://10.0.2.2:3000/api/v1";
+//    private static final String endPoint = "http://10.0.2.2:3000/api/v1";
 //    private static final String endPoint = "http://192.168.1.218:3000/api/v1";
-//    private static final String endPoint = "http://192.168.0.11:3000/api/v1";
+    private static final String endPoint = "http://192.168.0.11:3000/api/v1";
     private static final HttpCaller httpConn = new HttpCaller(false);
 
     public AppService() {
@@ -189,6 +189,21 @@ public class AppService {
         Pair<Integer, String> response = null;
         try {
             response = httpConn.sendRequest(endPoint + "/deleteTrackDayExercise?id=" + trackDayExerciseId, "DELETE", null, requestHeaders);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    public Pair<Integer, String> updateTrackDayExercise(String token, HashMap<String, String> postParams) {
+        HashMap<String, String> requestHeaders = new HashMap<String, String>();
+        requestHeaders.put("withCredentials", "true");
+        requestHeaders.put("Authorization", token);
+
+        Pair<Integer, String> response = null;
+        try {
+            response = httpConn.sendRequest(endPoint + "/updateTrackDayExercise", "PUT", postParams, requestHeaders);
         } catch (Exception e) {
             e.printStackTrace();
         }

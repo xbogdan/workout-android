@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.boamfa.workout.R;
@@ -25,7 +26,7 @@ import java.util.List;
  */
 public class BaseActivity extends AppCompatActivity {
 
-    protected static DrawerLayout drawerLayout;
+    public static DrawerLayout drawerLayout;
     protected static ActionBarDrawerToggle drawerListener;
     protected static ListView listView;
     protected static DrawerAdapter drawerAdapter;

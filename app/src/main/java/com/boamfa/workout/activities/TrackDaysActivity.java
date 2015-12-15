@@ -3,6 +3,7 @@ package com.boamfa.workout.activities;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -24,6 +25,9 @@ import com.boamfa.workout.classes.AppTask;
 import com.boamfa.workout.classes.Exercise;
 import com.boamfa.workout.classes.TrackDay;
 import com.boamfa.workout.classes.TrackDayExercise;
+import com.boamfa.workout.classes.User;
+import com.boamfa.workout.classes.UserLocalStore;
+import com.boamfa.workout.utils.AppService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +36,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrackDaysActivity extends BaseActivity {
+public class TrackDaysActivity extends BaseActivity implements InfoActivity {
 
     private TrackDay day;
 
@@ -59,62 +63,55 @@ public class TrackDaysActivity extends BaseActivity {
 
         day = trackList.get(trackIndex).days.get(dayIndex);
 
-        ExpandAdapter = new TrackDayExerciseAdapter(TrackDaysActivity.this, day.exercises, service, currentUser, userLocalStore);
-
         ExpandListView = (ExpandableListView) findViewById(R.id.expandableList);
-        ExpandListView.setAdapter(ExpandAdapter);
+        ExpandAdapter = new TrackDayExerciseAdapter(TrackDaysActivity.this, day.exercises);
 
+        ExpandListView.setAdapter(ExpandAdapter);
 
         /**
          * Setup exercises list
          */
         if (!gotExercises) {
             (new MainTask()).execute();
+
+            // Exercise popup window
+            exercisesPopup = new PopupWindow(drawerLayout, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, true);
+            exercisesPopup.setFocusable(true);
+
+            // Set popup window background
+            final RelativeLayout exercisesPopupBg = (RelativeLayout) inflater.inflate(R.layout.exercises_popup, null, false);
+            exercisesPopupBg.getBackground().setAlpha(220); // Dim the background color
+            exercisesPopup.setContentView(exercisesPopupBg);
+
+            // Setup search input
+            EditText exerciseSearch = (EditText) exercisesPopupBg.findViewById(R.id.exercises_search);
+            exerciseSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    exercisesAdapter.getFilter().filter(s.toString());
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+            });
+
+            // Exercise list
+            exercisesListView = (ListView) exercisesPopupBg.findViewById(R.id.exercises_list);
+
+            // Close popup button
+            Button closeButton = (Button) exercisesPopupBg.findViewById(R.id.exercises_close);
+            closeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    exercisesPopup.dismiss();
+                }
+            });
         }
-
-        // Exercise popup window
-        exercisesPopup = new PopupWindow(drawerLayout, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, true);
-        exercisesPopup.setFocusable(true);
-
-        // Set popup window background
-        final RelativeLayout exercisesPopupBg = (RelativeLayout) inflater.inflate(R.layout.exercises_popup, null, false);
-        exercisesPopupBg.getBackground().setAlpha(220); // Dim the background color
-        exercisesPopup.setContentView(exercisesPopupBg);
-
-        // Setup search input
-        EditText exerciseSearch = (EditText) exercisesPopupBg.findViewById(R.id.exercises_search);
-        exerciseSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                exercisesAdapter.getFilter().filter(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-
-        // Exercise list
-        exercisesListView = (ListView) exercisesPopupBg.findViewById(R.id.exercises_list);
-        exercisesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                exercisesPopup.dismiss();
-                Exercise selectedExercise = exercisesAdapter.getItem(position);
-                (new CreateTask(selectedExercise)).execute();
-            }
-        });
-
-        // Close popup button
-        Button closeButton = (Button) exercisesPopupBg.findViewById(R.id.exercises_close);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                exercisesPopup.dismiss();
-            }
-        });
 
         // Open pupup button
         FloatingActionButton floatingActionButton = (FloatingActionButton) contentView.findViewById(R.id.fab);
@@ -122,6 +119,14 @@ public class TrackDaysActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 exercisesPopup.showAtLocation(drawerLayout, Gravity.CENTER, 0, 0);
+                exercisesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        exercisesPopup.dismiss();
+                        Exercise selectedExercise = exercisesAdapter.getItem(position);
+                        (new CreateTask(selectedExercise)).execute();
+                    }
+                });
             }
         });
     }
@@ -143,6 +148,41 @@ public class TrackDaysActivity extends BaseActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public ExercisesAdapter getExerciseAdapter() {
+        return exercisesAdapter;
+    }
+
+    @Override
+    public AppService getService() {
+        return service;
+    }
+
+    @Override
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    @Override
+    public UserLocalStore getUserLocalStore() {
+        return userLocalStore;
+    }
+
+    @Override
+    public DrawerLayout getLayout() {
+        return drawerLayout;
+    }
+
+    @Override
+    public PopupWindow getExercisePopup() {
+        return exercisesPopup;
+    }
+
+    @Override
+    public ListView getExerciseListView() {
+        return exercisesListView;
     }
 
     public class MainTask extends AppTask {

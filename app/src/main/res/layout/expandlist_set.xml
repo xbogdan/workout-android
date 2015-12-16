@@ -44,6 +44,7 @@
     <LinearLayout
         android:id="@+id/surface_view"
         android:background="#F5F5F5"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <!--What you want to show in SurfaceView-->

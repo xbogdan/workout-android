@@ -1,6 +1,9 @@
 package com.boamfa.workout.activities;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
@@ -65,7 +68,6 @@ public class TrackDaysActivity extends BaseActivity implements InfoActivity {
 
         ExpandListView = (ExpandableListView) findViewById(R.id.expandableList);
         ExpandAdapter = new TrackDayExerciseAdapter(TrackDaysActivity.this, day.exercises);
-
         ExpandListView.setAdapter(ExpandAdapter);
 
         /**

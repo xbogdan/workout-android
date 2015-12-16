@@ -6,6 +6,7 @@
         android:id="@+id/tracker_item_text_view"
         android:layout_width="match_parent"
         android:padding="15dp"
+        android:textSize="14dp"
         android:textColor="@android:color/black"
         android:layout_height="match_parent" />
 </LinearLayout>

@@ -12,6 +12,7 @@
         android:id="@+id/expandableList"
         android:layout_width="match_parent"
         android:background="#FFFFFF"
+        android:groupIndicator="@drawable/group_indicator"
         android:layout_height="match_parent" />
 
     <android.support.design.widget.FloatingActionButton android:id="@+id/fab"

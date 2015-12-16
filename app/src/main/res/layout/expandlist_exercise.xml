@@ -44,6 +44,7 @@
     <LinearLayout
         android:id="@+id/surface_view"
         android:background="#ffffff"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <!--What you want to show in SurfaceView-->
@@ -51,11 +52,22 @@
         <TextView
             android:id="@+id/surface_text_view"
             android:paddingTop="15dp"
+            android:textSize="14dp"
+            android:layout_weight="1"
             android:paddingBottom="15dp"
-            android:paddingLeft="34dp"
+            android:paddingLeft="25dp"
             android:textColor="@android:color/black"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
+        <Button
+            android:text="add set"
+            android:textSize="10dp"
+            android:textColor="#27ae60"
+            android:layout_gravity="center_vertical"
+            android:background="@android:color/transparent"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content" />
     </LinearLayout>
     <!-- Surface View End -->
 </com.daimajia.swipe.SwipeLayout>

@@ -210,4 +210,49 @@ public class AppService {
 
         return response;
     }
+
+    public Pair<Integer, String> createTrackDayExerciseSet(String token, HashMap<String, String> postParams) {
+        HashMap<String, String> requestHeaders = new HashMap<String, String>();
+        requestHeaders.put("withCredentials", "true");
+        requestHeaders.put("Authorization", token);
+
+        Pair<Integer, String> response = null;
+        try {
+            response = httpConn.sendRequest(endPoint + "/createTrackDayExerciseSet", "POST", postParams, requestHeaders);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    public Pair<Integer, String> deleteTrackDayExerciseSet(String token, int id) {
+        HashMap<String, String> requestHeaders = new HashMap<String, String>();
+        requestHeaders.put("withCredentials", "true");
+        requestHeaders.put("Authorization", token);
+
+        Pair<Integer, String> response = null;
+        try {
+            response = httpConn.sendRequest(endPoint + "/deleteTrackDayExerciseSet?id=" + id, "DELETE", null, requestHeaders);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    public Pair<Integer, String> updateTrackDayExerciseSet(String token, HashMap<String, String> postParams) {
+        HashMap<String, String> requestHeaders = new HashMap<String, String>();
+        requestHeaders.put("withCredentials", "true");
+        requestHeaders.put("Authorization", token);
+
+        Pair<Integer, String> response = null;
+        try {
+            response = httpConn.sendRequest(endPoint + "/updateTrackDayExerciseSet", "PUT", postParams, requestHeaders);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
 }

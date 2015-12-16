@@ -56,7 +56,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         return childPosition;
     }
 
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View view, ViewGroup parent) {
+    public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View view, ViewGroup parent) {
         TrackDayExerciseSet child = (TrackDayExerciseSet) getChild(groupPosition, childPosition);
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) activity.getSystemService(activity.LAYOUT_INFLATER_SERVICE);
@@ -71,7 +71,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
             @Override
             public void onClick(View view) {
                 swipeLayout.close(false);
-
+                (new DeleteTrackDayExerciseSetTask(groupPosition, childPosition)).execute();
             }
         });
 
@@ -196,6 +196,29 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
 
         @Override
         public void onSuccess(String response) {
+        }
+    }
+
+    public class DeleteTrackDayExerciseSetTask extends AppTask {
+        int groupPosition;
+        int childPosition;
+
+        public DeleteTrackDayExerciseSetTask(int groupPosition, int childPosition) {
+            super((Context) context, context.getUserLocalStore());
+            this.groupPosition = groupPosition;
+            this.childPosition = childPosition;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            response = context.getService().deleteTrackDayExerciseSet(context.getCurrentUser().auth_token, groups.get(groupPosition).sets.get(childPosition).id);
+            return true;
+        }
+
+        @Override
+        public void onSuccess(String response) {
+            groups.get(groupPosition).sets.remove(childPosition);
+            notifyDataSetChanged();
         }
     }
 

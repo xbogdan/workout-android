@@ -158,13 +158,13 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         int position;
 
         public DeleteTrackDayExerciseTask(int position) {
-            super((Context) context, context.getUserLocalStore());
+            super((Context) context);
             this.position = position;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = context.getService().deleteTrackDayExercise(context.getCurrentUser().auth_token, groups.get(position).id);
+            response = context.getService().deleteTrackDayExercise(context.getAuthToken(), groups.get(position).id);
             return true;
         }
 
@@ -180,7 +180,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         int exercise_id;
 
         public UpdateTrackDayExerciseTask(int position, int exercise_id) {
-            super((Context) context, context.getUserLocalStore());
+            super((Context) context);
             this.position = position;
             this.exercise_id = exercise_id;
         }
@@ -190,7 +190,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
             HashMap<String, String> postParams = new HashMap<String, String>();
             postParams.put("id", groups.get(position).id + "");
             postParams.put("exercise_id", exercise_id + "");
-            response = context.getService().updateTrackDayExercise(context.getCurrentUser().auth_token, postParams);
+            response = context.getService().updateTrackDayExercise(context.getAuthToken(), postParams);
             return true;
         }
 
@@ -204,14 +204,14 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         int childPosition;
 
         public DeleteTrackDayExerciseSetTask(int groupPosition, int childPosition) {
-            super((Context) context, context.getUserLocalStore());
+            super((Context) context);
             this.groupPosition = groupPosition;
             this.childPosition = childPosition;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = context.getService().deleteTrackDayExerciseSet(context.getCurrentUser().auth_token, groups.get(groupPosition).sets.get(childPosition).id);
+            response = context.getService().deleteTrackDayExerciseSet(context.getAuthToken(), groups.get(groupPosition).sets.get(childPosition).id);
             return true;
         }
 

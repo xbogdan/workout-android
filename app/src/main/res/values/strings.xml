@@ -24,4 +24,7 @@
         completions."
     </string>
     <string name="auth_key">auth_key</string>
+
+    <string name="authTokenType">Full access</string>
+    <string name="accountType">workout.com</string>
 </resources>

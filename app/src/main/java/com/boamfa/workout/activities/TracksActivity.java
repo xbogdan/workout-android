@@ -1,5 +1,6 @@
 package com.boamfa.workout.activities;
 
+import android.accounts.Account;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -23,6 +24,7 @@ import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.classes.TrackDay;
 import com.boamfa.workout.classes.TrackDayExercise;
 import com.boamfa.workout.classes.TrackDayExerciseSet;
+import com.boamfa.workout.sync.AuthenticatorService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -95,7 +97,6 @@ public class TracksActivity extends BaseActivity {
             for (int i = 0, size1 = tracks.length(); i < size1; i++) {
                 JSONObject trackObj = tracks.getJSONObject(i);
                 Track track = new Track(trackObj.getInt("id"), trackObj.getString("name"));
-//                track.days = new ArrayList<TrackDay>();
                 trackList.add(track);
 
                 // days
@@ -108,7 +109,6 @@ public class TracksActivity extends BaseActivity {
                 for (int j = 0, size2 = days.length(); j < size2; j++) {
                     JSONObject trackDayObj = days.getJSONObject(j);
                     TrackDay trackDay = new TrackDay(trackDayObj.getInt("id"), trackDayObj.getString("date"));
-//                    trackDay.exercises = new ArrayList<TrackDayExercise>();
                     track.days.add(trackDay);
 
                     // exercises
@@ -121,7 +121,6 @@ public class TracksActivity extends BaseActivity {
                     for (int k = 0, size3 = exercises.length(); k < size3; k++) {
                         JSONObject trackDayExerciseObj = exercises.getJSONObject(k);
                         TrackDayExercise trackDayExercise = new TrackDayExercise(trackDayExerciseObj.getInt("id"), trackDayExerciseObj.getString("name"));
-//                        trackDayExercise.sets = new ArrayList<TrackDayExerciseSet>();
                         trackDay.exercises.add(trackDayExercise);
 
                         //sets
@@ -160,12 +159,12 @@ public class TracksActivity extends BaseActivity {
 
     public class MainTask extends AppTask {
         public MainTask() {
-            super(TracksActivity.this, userLocalStore);
+            super(TracksActivity.this);
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = service.getTracks(currentUser.auth_token);
+            response = service.getTracks(authToken);
             return true;
         }
 
@@ -179,13 +178,13 @@ public class TracksActivity extends BaseActivity {
         private String trackName;
 
         public CreateTask(String trackName) {
-            super(TracksActivity.this, userLocalStore);
+            super(TracksActivity.this);
             this.trackName = trackName;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = service.createTrack(currentUser.auth_token, trackName);
+            response = service.createTrack(authToken, trackName);
             return true;
         }
 

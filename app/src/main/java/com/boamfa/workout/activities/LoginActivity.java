@@ -1,5 +1,9 @@
 package com.boamfa.workout.activities;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -21,6 +25,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.View;
@@ -50,6 +55,15 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
+    public final static String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
+    public final static String ARG_AUTH_TYPE = "AUTH_TYPE";
+    public final static String ARG_ACCOUNT_NAME = "ACCOUNT_NAME";
+    public final static String ARG_IS_ADDING_NEW_ACCOUNT = "IS_ADDING_ACCOUNT";
+    public final static String PARAM_USER_PASS = "USER_PASS";
+
+    private String mAuthTokenType;
+
+
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -65,6 +79,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    AccountManager mAccountManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +111,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        mAccountManager = AccountManager.get(this);
+
+        mAuthTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
+        if (mAuthTokenType == null)
+            mAuthTokenType = getString(R.string.authTokenType);
     }
 
     private void populateAutoComplete() {
@@ -284,7 +305,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int IS_PRIMARY = 1;
     }
 
-
     private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         ArrayAdapter<String> adapter =
@@ -293,6 +313,31 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mEmailView.setAdapter(adapter);
     }
+
+    private void finishLogin(Intent intent) {
+
+        String accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+        String accountPassword = intent.getStringExtra(PARAM_USER_PASS);
+
+        final Account account = new Account(accountName, intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
+
+        if (getIntent().getBooleanExtra(ARG_IS_ADDING_NEW_ACCOUNT, false)) {
+            String authtoken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
+            String authtokenType = mAuthTokenType;
+
+            // Creating the account on the device and setting the auth token we got
+            // (Not setting the auth token will cause another call to the server to authenticate the user)
+            mAccountManager.addAccountExplicitly(account, accountPassword, null);
+            mAccountManager.setAuthToken(account, authtokenType, authtoken);
+        } else {
+            mAccountManager.setPassword(account, accountPassword);
+        }
+
+//        setAccountAuthenticatorResult(intent.getExtras());
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
@@ -304,6 +349,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private final String mPassword;
         private final Activity mActivity;
         private Pair<Integer, String> response;
+        private Intent res;
 
         UserLoginTask(String email, String password, Activity activity) {
             mEmail = email;
@@ -315,6 +361,28 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Boolean doInBackground(Void... params) {
             AppService service = new AppService();
             response = service.login(this.mEmail, this.mPassword);
+            JSONObject jsonResponse = null;
+            Bundle data = new Bundle();
+            try {
+                jsonResponse = new JSONObject(response.second);
+//                User user = new User(jsonResponse.getInt("id"), jsonResponse.getString("email"), jsonResponse.getString("auth_token"));
+//                UserLocalStore userLocalStore = new UserLocalStore(this.mActivity);
+//                userLocalStore.storeUserData(user);
+
+                String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
+
+                System.out.println(accountType);
+
+                data.putString(AccountManager.KEY_ACCOUNT_NAME, this.mEmail);
+                data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
+                data.putString(AccountManager.KEY_AUTHTOKEN, jsonResponse.getString("auth_token"));
+                data.putString(PARAM_USER_PASS, this.mPassword);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            res = new Intent();
+            res.putExtras(data);
             return true;
         }
 
@@ -324,20 +392,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                JSONObject jsonResponse = null;
-                try {
-                    jsonResponse = new JSONObject(response.second);
-                    UserLocalStore userLocalStore = new UserLocalStore(this.mActivity);
-                    User user = new User(jsonResponse.getInt("id"), jsonResponse.getString("email"), jsonResponse.getString("auth_token"));
-                    userLocalStore.storeUserData(user);
+//                JSONObject jsonResponse = null;
+//                try {
+//                    jsonResponse = new JSONObject(response.second);
+//                    UserLocalStore userLocalStore = new UserLocalStore(this.mActivity);
+//                    User user = new User(jsonResponse.getInt("id"), jsonResponse.getString("email"), jsonResponse.getString("auth_token"));
+//                    userLocalStore.storeUserData(user);
+//
+//                    Intent i = new Intent(LoginActivity.this, TracksActivity.class);
+//                    startActivity(i);
 
-                    Intent i = new Intent(LoginActivity.this, TracksActivity.class);
-                    startActivity(i);
-
-                    finish();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//                    finish();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+                finishLogin(this.res);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();

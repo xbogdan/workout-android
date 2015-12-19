@@ -163,11 +163,6 @@ public class TrackDaysActivity extends BaseActivity implements InfoActivity {
     }
 
     @Override
-    public User getCurrentUser() {
-        return currentUser;
-    }
-
-    @Override
     public UserLocalStore getUserLocalStore() {
         return userLocalStore;
     }
@@ -187,14 +182,19 @@ public class TrackDaysActivity extends BaseActivity implements InfoActivity {
         return exercisesListView;
     }
 
+    @Override
+    public String getAuthToken() {
+        return authToken;
+    }
+
     public class MainTask extends AppTask {
         public MainTask() {
-            super(TrackDaysActivity.this, userLocalStore);
+            super(TrackDaysActivity.this);
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = service.getExercises(currentUser.auth_token);
+            response = service.getExercises(authToken);
             return true;
         }
 
@@ -208,13 +208,13 @@ public class TrackDaysActivity extends BaseActivity implements InfoActivity {
         Exercise exercise;
 
         public CreateTask(Exercise exercise) {
-            super(TrackDaysActivity.this, userLocalStore);
+            super(TrackDaysActivity.this);
             this.exercise = exercise;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = service.createTrackDayExercise(currentUser.auth_token, day.id, exercise.id);
+            response = service.createTrackDayExercise(authToken, day.id, exercise.id);
             return true;
         }
 

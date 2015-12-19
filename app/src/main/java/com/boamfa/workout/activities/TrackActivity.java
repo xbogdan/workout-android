@@ -100,7 +100,7 @@ public class TrackActivity extends BaseActivity {
         private String date;
 
         public CreateTrackDayTask(String date) {
-            super(TrackActivity.this, userLocalStore);
+            super(TrackActivity.this);
             this.date = date;
         }
 
@@ -122,7 +122,7 @@ public class TrackActivity extends BaseActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = service.createTrackDay(currentUser.auth_token, track.id, date);
+            response = service.createTrackDay(authToken, track.id, date);
             return true;
         }
     }

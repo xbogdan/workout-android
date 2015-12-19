@@ -13,7 +13,6 @@ public interface InfoActivity {
     ExercisesAdapter getExerciseAdapter();
     AppService getService();
 
-    User getCurrentUser();
     UserLocalStore getUserLocalStore();
 
     DrawerLayout getLayout();
@@ -21,4 +20,6 @@ public interface InfoActivity {
     PopupWindow getExercisePopup();
 
     ListView getExerciseListView();
+
+    String getAuthToken();
 }

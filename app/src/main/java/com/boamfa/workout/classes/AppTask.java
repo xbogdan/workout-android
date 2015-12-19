@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Pair;
 
+import com.boamfa.workout.R;
 import com.boamfa.workout.activities.LoginActivity;
 
 /**
@@ -14,18 +15,16 @@ public abstract class AppTask extends AsyncTask<Void, Void, Boolean> {
     protected Pair<Integer, String> response;
     public abstract void onSuccess(String response);
     private Context context;
-    private UserLocalStore userLocalStore;
 
-    public AppTask(Context context, UserLocalStore userLocalStore) {
+    public AppTask(Context context) {
         this.context = context;
-        this.userLocalStore = userLocalStore;
     }
 
     @Override
     protected void onPostExecute(Boolean success) {
         if (success) {
             if (response == null) {
-                userLocalStore.clearUserData();
+                // TODO invalidate credentials
                 // TODO: Network error
             } else {
                 switch (response.first) {
@@ -36,9 +35,12 @@ public abstract class AppTask extends AsyncTask<Void, Void, Boolean> {
                         onSuccess(response.second);
                         break;
                     case 401:
-                        userLocalStore.clearUserData();
-                        Intent i = new Intent(context, LoginActivity.class);
-                        context.startActivity(i);
+                        // TODO invalidate credentials
+                        Intent intent = new Intent(context, LoginActivity.class);
+                        intent.putExtra(LoginActivity.ARG_ACCOUNT_TYPE, context.getString(R.string.accountType));
+                        intent.putExtra(LoginActivity.ARG_AUTH_TYPE, context.getString(R.string.authTokenType));
+                        intent.putExtra(LoginActivity.ARG_IS_ADDING_NEW_ACCOUNT, true);
+                        context.startActivity(intent);
                         break;
                     case 400:
                         break;

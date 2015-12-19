@@ -1,5 +1,7 @@
 package com.boamfa.workout.activities;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -38,6 +40,10 @@ public class BaseActivity extends AppCompatActivity {
 
     protected static List<Track> trackList;
 
+    protected static AccountManager accountManager;
+    protected static Account currentAccount;
+    public static String authToken;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +52,8 @@ public class BaseActivity extends AppCompatActivity {
         listView = (ListView) findViewById( R.id.drawerList );
         drawerAdapter = new DrawerAdapter(this);
         listView.setAdapter(drawerAdapter);
+
+        accountManager = AccountManager.get(this);
 
         Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar(toolbar);

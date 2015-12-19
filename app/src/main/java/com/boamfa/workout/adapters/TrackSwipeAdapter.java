@@ -133,14 +133,14 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
         private int trackDayId;
 
         public DeleteTask(int trackId, int trackDayId) {
-            super(context, context.userLocalStore);
+            super(context);
             this.trackId = trackId;
             this.trackDayId = trackDayId;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = context.service.deleteTrackDay(context.currentUser.auth_token, trackId, trackDayId);
+            response = context.service.deleteTrackDay(context.authToken, trackId, trackDayId);
             return true;
         }
 
@@ -156,7 +156,7 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
         private TrackDay trackDay;
 
         public UpdateTask(int trackId, TrackDay trackDay, String date) {
-            super(context, context.userLocalStore);
+            super(context);
             this.date = date;
             this.trackId = trackId;
             this.trackDay = trackDay;
@@ -170,7 +170,7 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
             postParams.put("track[track_days_attributes[][date]]", date);
             postParams.put("track[track_days_attributes[][track_id]]", trackId + "");
 
-            response = context.service.updateTrack(context.currentUser.auth_token, postParams);
+            response = context.service.updateTrack(context.authToken, postParams);
             return true;
         }
 

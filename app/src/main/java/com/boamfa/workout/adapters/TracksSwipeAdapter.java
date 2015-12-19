@@ -121,13 +121,13 @@ public class TracksSwipeAdapter extends BaseSwipeAdapter {
         private int trackId;
 
         public DeleteTrackTask(int trackId) {
-            super(context, context.userLocalStore);
+            super(context);
             this.trackId = trackId;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = context.service.deleteTrack(context.currentUser.auth_token, trackId);
+            response = context.service.deleteTrack(context.authToken, trackId);
             return true;
         }
 
@@ -142,7 +142,7 @@ public class TracksSwipeAdapter extends BaseSwipeAdapter {
         private String trackName;
 
         public UpdateTrackNameTask(int trackId, String trackName) {
-            super(context, context.userLocalStore);
+            super(context);
             this.trackId = trackId;
             this.trackName = trackName;
         }
@@ -152,7 +152,7 @@ public class TracksSwipeAdapter extends BaseSwipeAdapter {
             HashMap<String, String> postParams = new HashMap<String, String>();
             postParams.put("track[id]", trackId + "");
             postParams.put("track[name]",trackName);
-            response = context.service.updateTrack(context.currentUser.auth_token, postParams);
+            response = context.service.updateTrack(context.authToken, postParams);
             return true;
         }
 

@@ -122,7 +122,7 @@ public class TrackActivity extends BaseActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = service.createTrackDay(authToken, track.id, date);
+            response = service.createTrackDay(track.id, date);
             return true;
         }
     }

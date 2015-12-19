@@ -13,8 +13,11 @@ public class AppService {
 //    private static final String endPoint = "http://192.168.1.218:3000/api/v1";
     private static final String endPoint = "http://192.168.0.11:3000/api/v1";
     private static final HttpCaller httpConn = new HttpCaller(false);
+    private static String authToken;
 
-    public AppService() {
+    public AppService() {}
+    public AppService(String mAuthToken) {
+        authToken = mAuthToken;
     }
 
     public Pair<Integer, String> login(String email, String password) {
@@ -35,10 +38,10 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> getTracks(String token) {
+    public Pair<Integer, String> getTracks() {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -50,10 +53,10 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> getTrack(String token, Integer trackId) {
+    public Pair<Integer, String> getTrack(Integer trackId) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -65,10 +68,10 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> deleteTrack(String token, Integer trackId) {
+    public Pair<Integer, String> deleteTrack(Integer trackId) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -80,13 +83,13 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> createTrack(String token, String trackName) {
+    public Pair<Integer, String> createTrack(String trackName) {
         HashMap<String, String> postParams = new HashMap<String, String>();
         postParams.put("track[name]", trackName);
 
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -98,10 +101,10 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> updateTrack(String token, HashMap<String, String> postParams) {
+    public Pair<Integer, String> updateTrack(HashMap<String, String> postParams) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -113,14 +116,14 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> createTrackDay(String token, int trackId, String date) {
+    public Pair<Integer, String> createTrackDay(int trackId, String date) {
         HashMap<String, String> postParams = new HashMap<String, String>();
         postParams.put("track_id", trackId + "");
         postParams.put("date", date);
 
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -132,10 +135,10 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> deleteTrackDay(String token, int trackId, int dayId) {
+    public Pair<Integer, String> deleteTrackDay(int trackId, int dayId) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -147,10 +150,10 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> getExercises(String token) {
+    public Pair<Integer, String> getExercises() {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -162,14 +165,14 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> createTrackDayExercise(String token, int dayId, int exerciseId) {
+    public Pair<Integer, String> createTrackDayExercise(int dayId, int exerciseId) {
         HashMap<String, String> postParams = new HashMap<String, String>();
         postParams.put("day_id", dayId + "");
         postParams.put("exercise_id", exerciseId + "");
 
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -181,10 +184,10 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> deleteTrackDayExercise(String token, int trackDayExerciseId) {
+    public Pair<Integer, String> deleteTrackDayExercise(int trackDayExerciseId) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -196,10 +199,10 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> updateTrackDayExercise(String token, HashMap<String, String> postParams) {
+    public Pair<Integer, String> updateTrackDayExercise(HashMap<String, String> postParams) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -211,10 +214,10 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> createTrackDayExerciseSet(String token, HashMap<String, String> postParams) {
+    public Pair<Integer, String> createTrackDayExerciseSet(HashMap<String, String> postParams) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -226,10 +229,10 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> deleteTrackDayExerciseSet(String token, int id) {
+    public Pair<Integer, String> deleteTrackDayExerciseSet(int id) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
@@ -241,10 +244,10 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> updateTrackDayExerciseSet(String token, HashMap<String, String> postParams) {
+    public Pair<Integer, String> updateTrackDayExerciseSet(HashMap<String, String> postParams) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
-        requestHeaders.put("Authorization", token);
+        requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {

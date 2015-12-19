@@ -127,7 +127,7 @@ public class TracksSwipeAdapter extends BaseSwipeAdapter {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = context.service.deleteTrack(context.authToken, trackId);
+            response = context.service.deleteTrack(trackId);
             return true;
         }
 
@@ -152,7 +152,7 @@ public class TracksSwipeAdapter extends BaseSwipeAdapter {
             HashMap<String, String> postParams = new HashMap<String, String>();
             postParams.put("track[id]", trackId + "");
             postParams.put("track[name]",trackName);
-            response = context.service.updateTrack(context.authToken, postParams);
+            response = context.service.updateTrack(postParams);
             return true;
         }
 

@@ -82,7 +82,7 @@ public class BaseActivity extends AppCompatActivity {
 
         drawerLayout.setDrawerListener(drawerListener);
 
-        service = new AppService();
+        service = new AppService(authToken);
         userLocalStore = new UserLocalStore(this);
         currentUser = userLocalStore.getLoggedInUser();
 

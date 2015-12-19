@@ -164,7 +164,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = context.getService().deleteTrackDayExercise(context.getAuthToken(), groups.get(position).id);
+            response = context.getService().deleteTrackDayExercise(groups.get(position).id);
             return true;
         }
 
@@ -190,7 +190,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
             HashMap<String, String> postParams = new HashMap<String, String>();
             postParams.put("id", groups.get(position).id + "");
             postParams.put("exercise_id", exercise_id + "");
-            response = context.getService().updateTrackDayExercise(context.getAuthToken(), postParams);
+            response = context.getService().updateTrackDayExercise(postParams);
             return true;
         }
 
@@ -211,7 +211,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = context.getService().deleteTrackDayExerciseSet(context.getAuthToken(), groups.get(groupPosition).sets.get(childPosition).id);
+            response = context.getService().deleteTrackDayExerciseSet(groups.get(groupPosition).sets.get(childPosition).id);
             return true;
         }
 

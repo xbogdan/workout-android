@@ -140,7 +140,7 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = context.service.deleteTrackDay(context.authToken, trackId, trackDayId);
+            response = context.service.deleteTrackDay(trackId, trackDayId);
             return true;
         }
 
@@ -170,7 +170,7 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
             postParams.put("track[track_days_attributes[][date]]", date);
             postParams.put("track[track_days_attributes[][track_id]]", trackId + "");
 
-            response = context.service.updateTrack(context.authToken, postParams);
+            response = context.service.updateTrack(postParams);
             return true;
         }
 

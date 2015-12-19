@@ -194,7 +194,7 @@ public class TrackDaysActivity extends BaseActivity implements InfoActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = service.getExercises(authToken);
+            response = service.getExercises();
             return true;
         }
 
@@ -214,7 +214,7 @@ public class TrackDaysActivity extends BaseActivity implements InfoActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = service.createTrackDayExercise(authToken, day.id, exercise.id);
+            response = service.createTrackDayExercise(day.id, exercise.id);
             return true;
         }
 

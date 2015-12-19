@@ -164,7 +164,7 @@ public class TracksActivity extends BaseActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = service.getTracks(authToken);
+            response = service.getTracks();
             return true;
         }
 
@@ -184,7 +184,7 @@ public class TracksActivity extends BaseActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            response = service.createTrack(authToken, trackName);
+            response = service.createTrack(trackName);
             return true;
         }
 

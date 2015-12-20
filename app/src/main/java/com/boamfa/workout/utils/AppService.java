@@ -13,7 +13,7 @@ public class AppService {
 //    private static final String endPoint = "http://192.168.1.218:3000/api/v1";
     private static final String endPoint = "http://192.168.0.11:3000/api/v1";
     private static final HttpCaller httpConn = new HttpCaller(false);
-    private static String authToken;
+    public static String authToken;
 
     public AppService() {}
     public AppService(String mAuthToken) {

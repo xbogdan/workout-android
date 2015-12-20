@@ -14,6 +14,7 @@ import android.view.View;
 import com.boamfa.workout.R;
 import com.boamfa.workout.classes.User;
 import com.boamfa.workout.classes.UserLocalStore;
+import com.boamfa.workout.utils.AppService;
 
 import java.io.IOException;
 
@@ -26,31 +27,6 @@ public class MainActivity extends BaseActivity {
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View contentView = inflater.inflate(R.layout.activity_main, null, false);
         drawerLayout.addView(contentView, 0);
-
-//        UserLocalStore userLocalStore = new UserLocalStore(this);
-//        User currentUser = userLocalStore.getLoggedInUser();
-
-//        System.out.println("ACCOUNTS ======");
-//        System.out.println(availableAccounts);
-//        System.out.println(availableAccounts.length);
-
-//        System.out.println(availableAccounts[0]);
-//        Account acc = availableAccounts[0];
-//        final AccountManagerFuture<Bundle> future = am.getAuthToken(acc, "Full access", null, this, null, null);
-//        System.out.println(future);
-
-//        try {
-//            System.out.println(future.getResult());
-//        } catch (OperationCanceledException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (AuthenticatorException e) {
-//            e.printStackTrace();
-//        }
-
-
-//        final AccountManagerFuture<Bundle> future = am.getAuthToken(account, authTokenType, null, this, null, null);
 
         final String accountType = getString(R.string.accountType);
         final String authTokenType = getString(R.string.authTokenType);
@@ -74,6 +50,7 @@ public class MainActivity extends BaseActivity {
             } catch (AuthenticatorException e) {
                 e.printStackTrace();
             }
+            service = new AppService(authToken);
             Intent i = new Intent(MainActivity.this, TracksActivity.class);
             startActivity(i);
         }

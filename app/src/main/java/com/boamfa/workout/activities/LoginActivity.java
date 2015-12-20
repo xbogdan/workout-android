@@ -2,8 +2,6 @@ package com.boamfa.workout.activities;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -25,7 +23,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.View;
@@ -42,8 +39,6 @@ import java.util.List;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.utils.AppService;
-import com.boamfa.workout.classes.User;
-import com.boamfa.workout.classes.UserLocalStore;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -371,8 +366,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 
-                System.out.println(accountType);
-
                 data.putString(AccountManager.KEY_ACCOUNT_NAME, this.mEmail);
                 data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
                 data.putString(AccountManager.KEY_AUTHTOKEN, jsonResponse.getString("auth_token"));
@@ -392,20 +385,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-//                JSONObject jsonResponse = null;
-//                try {
-//                    jsonResponse = new JSONObject(response.second);
-//                    UserLocalStore userLocalStore = new UserLocalStore(this.mActivity);
-//                    User user = new User(jsonResponse.getInt("id"), jsonResponse.getString("email"), jsonResponse.getString("auth_token"));
-//                    userLocalStore.storeUserData(user);
-//
-//                    Intent i = new Intent(LoginActivity.this, TracksActivity.class);
-//                    startActivity(i);
-
-//                    finish();
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(i);
                 finishLogin(this.res);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));

@@ -30,6 +30,7 @@ import com.boamfa.workout.classes.TrackDay;
 import com.boamfa.workout.classes.TrackDayExercise;
 import com.boamfa.workout.classes.User;
 import com.boamfa.workout.classes.UserLocalStore;
+import com.boamfa.workout.database.DatabaseHandler;
 import com.boamfa.workout.utils.AppService;
 
 import org.json.JSONArray;
@@ -61,20 +62,19 @@ public class TrackDaysActivity extends BaseActivity implements InfoActivity {
         View contentView = inflater.inflate(R.layout.activity_track_days, null, false);
         drawerLayout.addView(contentView, 0);
 
-        int trackIndex = getIntent().getIntExtra("track_index", -1);
-        int dayIndex = getIntent().getIntExtra("day_index", -1);
-
-        day = trackList.get(trackIndex).days.get(dayIndex);
+        final long trackDayId = getIntent().getLongExtra("track_day_id", -1);
+        final ArrayList<TrackDayExercise> trackDayExercises = db.getTrackDayExercises(trackDayId);
 
         ExpandListView = (ExpandableListView) findViewById(R.id.expandableList);
-        ExpandAdapter = new TrackDayExerciseAdapter(TrackDaysActivity.this, day.exercises);
+        ExpandAdapter = new TrackDayExerciseAdapter(TrackDaysActivity.this, trackDayExercises);
         ExpandListView.setAdapter(ExpandAdapter);
 
         /**
          * Setup exercises list
          */
         if (!gotExercises) {
-            (new MainTask()).execute();
+            exerciseList = db.getExercises();
+            gotExercises = true;
 
             // Exercise popup window
             exercisesPopup = new PopupWindow(drawerLayout, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, true);
@@ -84,6 +84,13 @@ public class TrackDaysActivity extends BaseActivity implements InfoActivity {
             final RelativeLayout exercisesPopupBg = (RelativeLayout) inflater.inflate(R.layout.exercises_popup, null, false);
             exercisesPopupBg.getBackground().setAlpha(220); // Dim the background color
             exercisesPopup.setContentView(exercisesPopupBg);
+
+            // Exercise list
+            exercisesListView = (ListView) exercisesPopupBg.findViewById(R.id.exercises_list);
+
+            exercisesAdapter = new ExercisesAdapter(TrackDaysActivity.this, exerciseList, exercisesPopup);
+            exercisesListView.setAdapter(exercisesAdapter);
+            exercisesAdapter.notifyDataSetChanged();
 
             // Setup search input
             EditText exerciseSearch = (EditText) exercisesPopupBg.findViewById(R.id.exercises_search);
@@ -101,9 +108,6 @@ public class TrackDaysActivity extends BaseActivity implements InfoActivity {
                 public void afterTextChanged(Editable s) {
                 }
             });
-
-            // Exercise list
-            exercisesListView = (ListView) exercisesPopupBg.findViewById(R.id.exercises_list);
 
             // Close popup button
             Button closeButton = (Button) exercisesPopupBg.findViewById(R.id.exercises_close);
@@ -126,45 +130,19 @@ public class TrackDaysActivity extends BaseActivity implements InfoActivity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         exercisesPopup.dismiss();
                         Exercise selectedExercise = exercisesAdapter.getItem(position);
-                        (new CreateTask(selectedExercise)).execute();
+                        TrackDayExercise trackDayExercise = new TrackDayExercise(selectedExercise.name, selectedExercise.id, trackDayId);
+                        trackDayExercise.id = db.addTrackDayExercise(trackDayExercise);
+                        trackDayExercises.add(trackDayExercise);
+                        ExpandAdapter.notifyDataSetChanged();
                     }
                 });
             }
         });
     }
 
-    private void createExerciseList(String json) {
-        exerciseList = new ArrayList<Exercise>();
-        try {
-            JSONObject jsonResponse = new JSONObject(json);
-            final JSONArray exercises = jsonResponse.getJSONArray("exercises");
-            for (int i = 0, size1 = exercises.length(); i < size1; i++) {
-                JSONObject exerciseObj = exercises.getJSONObject(i);
-                Exercise e = new Exercise(exerciseObj.getInt("id"), exerciseObj.getString("name"), exerciseObj.getInt("muscle_group_id"), exerciseObj.getString("muscle_group_name"));
-                exerciseList.add(e);
-            }
-            exercisesAdapter = new ExercisesAdapter(TrackDaysActivity.this, exerciseList, exercisesPopup);
-            exercisesListView.setAdapter(exercisesAdapter);
-            exercisesAdapter.notifyDataSetChanged();
-            gotExercises = true;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public ExercisesAdapter getExerciseAdapter() {
         return exercisesAdapter;
-    }
-
-    @Override
-    public AppService getService() {
-        return service;
-    }
-
-    @Override
-    public UserLocalStore getUserLocalStore() {
-        return userLocalStore;
     }
 
     @Override
@@ -183,52 +161,7 @@ public class TrackDaysActivity extends BaseActivity implements InfoActivity {
     }
 
     @Override
-    public String getAuthToken() {
-        return authToken;
-    }
-
-    public class MainTask extends AppTask {
-        public MainTask() {
-            super(TrackDaysActivity.this);
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            response = service.getExercises();
-            return true;
-        }
-
-        @Override
-        public void onSuccess(String response) {
-            createExerciseList(response);
-        }
-    }
-
-    public class CreateTask extends AppTask {
-        Exercise exercise;
-
-        public CreateTask(Exercise exercise) {
-            super(TrackDaysActivity.this);
-            this.exercise = exercise;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            response = service.createTrackDayExercise(day.id, exercise.id);
-            return true;
-        }
-
-        @Override
-        public void onSuccess(String response) {
-            try {
-                JSONObject jsonResponse = new JSONObject(response);
-                int trackDayExerciseId = jsonResponse.getInt("track_day_exercise_id");
-                TrackDayExercise trackDayExercise = new TrackDayExercise(trackDayExerciseId, this.exercise.name);
-                day.exercises.add(trackDayExercise);
-                ExpandAdapter.notifyDataSetChanged();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
+    public DatabaseHandler getDBHandler() {
+        return db;
     }
 }

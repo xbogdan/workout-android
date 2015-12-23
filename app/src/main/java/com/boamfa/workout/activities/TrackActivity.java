@@ -24,11 +24,11 @@ import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class TrackActivity extends BaseActivity {
 
-    private Track track;
     private final Activity self = this;
     private ListView trackDayList;
     private TrackSwipeAdapter trackDaysListAdapter;
@@ -37,14 +37,28 @@ public class TrackActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final int trackIndex = getIntent().getIntExtra("track_index", -1);
+        final long trackId = getIntent().getIntExtra("track_id", -1);
 
-        track = trackList.get(trackIndex);
+        final ArrayList<TrackDay> trackDays = db.getTrackDays(trackId);
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View contentView = inflater.inflate(R.layout.activity_track, null, false);
 
         drawerLayout.addView(contentView, 0);
+
+        trackDayList = (ListView) findViewById(R.id.trackDayList);
+
+        trackDaysListAdapter = new TrackSwipeAdapter(this, R.layout.tracks_item, R.id.swipe, trackId, trackDays);
+        trackDayList.setAdapter(trackDaysListAdapter);
+        trackDayList.setClickable(true);
+        trackDayList.setOnItemClickListener(new ListView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(TrackActivity.this, TrackDaysActivity.class);
+                i.putExtra("track_day_id", trackDays.get(position).id);
+                startActivity(i);
+            }
+        });
 
         FloatingActionButton floatingActionButton = (FloatingActionButton) contentView.findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -60,7 +74,12 @@ public class TrackActivity extends BaseActivity {
                         myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
                         String newDate = format.format(myCalendar.getTime());
-                        (new CreateTrackDayTask(newDate)).execute();
+
+                        TrackDay newTrackDay = new TrackDay(newDate, trackId);
+                        newTrackDay.id = db.addTrackDay(newTrackDay);
+
+                        trackDays.add(newTrackDay);
+                        trackDaysListAdapter.notifyDataSetChanged();
                     }
 
                 };
@@ -74,56 +93,10 @@ public class TrackActivity extends BaseActivity {
                 ).show();
             }
         });
-
-        trackDayList = (ListView) findViewById(R.id.trackDayList);
-
-        trackDaysListAdapter = new TrackSwipeAdapter(this, R.layout.tracks_item, R.id.swipe, track.id, track.days);
-        trackDayList.setAdapter(trackDaysListAdapter);
-        trackDayList.setClickable(true);
-        trackDayList.setOnItemClickListener(new ListView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(TrackActivity.this, TrackDaysActivity.class);
-                i.putExtra("track_index", trackIndex);
-                i.putExtra("day_index", position);
-                startActivity(i);
-            }
-        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return super.onCreateOptionsMenu(menu);
-    }
-
-    public class CreateTrackDayTask extends AppTask {
-        private String date;
-
-        public CreateTrackDayTask(String date) {
-            super(TrackActivity.this);
-            this.date = date;
-        }
-
-        @Override
-        public void onSuccess(String response) {
-            try {
-                JSONObject jsonResponse = new JSONObject(response);
-                int trackDayId = jsonResponse.getInt("day_id");
-
-                TrackDay newTrackDay = new TrackDay(trackDayId, date);
-                newTrackDay.setItems();
-
-                track.days.add(newTrackDay);
-                trackDaysListAdapter.notifyDataSetChanged();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            response = service.createTrackDay(track.id, date);
-            return true;
-        }
     }
 }

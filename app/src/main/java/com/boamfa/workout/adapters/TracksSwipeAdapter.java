@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * Swipe adapter
  * Created by bogdan on 02/12/15.
  */
 public class TracksSwipeAdapter extends BaseSwipeAdapter {
@@ -52,8 +53,7 @@ public class TracksSwipeAdapter extends BaseSwipeAdapter {
             public void onClick(View view) {
                 swipeLayout.close(false);
 
-                DeleteTrackTask task = new DeleteTrackTask(objects.get(position).id);
-                task.execute();
+                context.db.deleteTrack(objects.get(position).id);
 
                 objects.remove(position);
                 notifyDataSetChanged();
@@ -78,8 +78,10 @@ public class TracksSwipeAdapter extends BaseSwipeAdapter {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String m_Text = input.getText().toString();
-                        (new UpdateTrackNameTask(objects.get(position).id, m_Text)).execute();
                         objects.get(position).name = m_Text;
+
+                        context.db.updateTrack(objects.get(position));
+
                         notifyDataSetChanged();
                     }
                 });
@@ -114,51 +116,5 @@ public class TracksSwipeAdapter extends BaseSwipeAdapter {
     @Override
     public long getItemId(int position) {
         return position;
-    }
-
-
-    public class DeleteTrackTask extends AppTask {
-        private int trackId;
-
-        public DeleteTrackTask(int trackId) {
-            super(context);
-            this.trackId = trackId;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            response = context.service.deleteTrack(trackId);
-            return true;
-        }
-
-        @Override
-        public void onSuccess(String response) {
-
-        }
-    }
-
-    public class UpdateTrackNameTask extends AppTask {
-        private int trackId;
-        private String trackName;
-
-        public UpdateTrackNameTask(int trackId, String trackName) {
-            super(context);
-            this.trackId = trackId;
-            this.trackName = trackName;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            HashMap<String, String> postParams = new HashMap<String, String>();
-            postParams.put("track[id]", trackId + "");
-            postParams.put("track[name]",trackName);
-            response = context.service.updateTrack(postParams);
-            return true;
-        }
-
-        @Override
-        public void onSuccess(String response) {
-
-        }
     }
 }

@@ -52,5 +52,13 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+        <provider
+            android:name=".sync.AppContentProvider"
+            android:authorities="workout.com"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:label="AppContentProvider"
+            android:readPermission="workout.com.READ"
+            android:writePermission="workout.com.WRITE" />
     </application>
 </manifest>

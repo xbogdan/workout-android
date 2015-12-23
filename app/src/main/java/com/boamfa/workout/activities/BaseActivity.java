@@ -11,16 +11,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.DrawerAdapter;
+import com.boamfa.workout.classes.Exercise;
 import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.utils.AppService;
 import com.boamfa.workout.classes.User;
 import com.boamfa.workout.classes.UserLocalStore;
+import com.boamfa.workout.database.DatabaseHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,6 +46,8 @@ public class BaseActivity extends AppCompatActivity {
     protected static Account currentAccount;
     public static String authToken;
 
+    public static DatabaseHandler db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +58,16 @@ public class BaseActivity extends AppCompatActivity {
         listView.setAdapter(drawerAdapter);
 
         accountManager = AccountManager.get(this);
+        db = new DatabaseHandler(this);
+
+//        db.print();
+//        db.reinstall();
+//        db.addExercise("Dumbell curl");
+//        db.addExercise("Barbell curl");
+//        db.addExercise("Incline press");
+//        db.addExercise("Pullups");
+//        db.addExercise("Chinups");
+//        db.addExercise("Dumbell rows");
 
         Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar(toolbar);

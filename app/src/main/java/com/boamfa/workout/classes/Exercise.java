@@ -5,11 +5,16 @@ package com.boamfa.workout.classes;
  */
 public class Exercise {
     public String name;
-    public int id;
-    public int muscleGroupId;
+    public long id;
+    public long muscleGroupId;
     public String muscleGroupName;
 
-    public Exercise(int id, String name, int muscleGroupId, String muscleGroupName) {
+    public Exercise(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Exercise(long id, String name, long muscleGroupId, String muscleGroupName) {
         this.id = id;
         this.name = name;
         this.muscleGroupId = muscleGroupId;

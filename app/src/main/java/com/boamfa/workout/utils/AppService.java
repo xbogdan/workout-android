@@ -10,8 +10,8 @@ import java.util.HashMap;
 public class AppService {
 
 //    private static final String endPoint = "http://10.0.2.2:3000/api/v1";
-//    private static final String endPoint = "http://192.168.1.218:3000/api/v1";
-    private static final String endPoint = "http://192.168.0.11:3000/api/v1";
+    private static final String endPoint = "http://192.168.1.218:3000/api/v1";
+//    private static final String endPoint = "http://192.168.0.11:3000/api/v1";
     private static final HttpCaller httpConn = new HttpCaller(false);
     public static String authToken;
 
@@ -68,7 +68,7 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> deleteTrack(Integer trackId) {
+    public Pair<Integer, String> deleteTrack(long trackId) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
         requestHeaders.put("Authorization", authToken);
@@ -116,7 +116,7 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> createTrackDay(int trackId, String date) {
+    public Pair<Integer, String> createTrackDay(long trackId, String date) {
         HashMap<String, String> postParams = new HashMap<String, String>();
         postParams.put("track_id", trackId + "");
         postParams.put("date", date);
@@ -135,14 +135,14 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> deleteTrackDay(int trackId, int dayId) {
+    public Pair<Integer, String> deleteTrackDay(long dayId) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
         requestHeaders.put("Authorization", authToken);
 
         Pair<Integer, String> response = null;
         try {
-            response = httpConn.sendRequest(endPoint + "/deleteTrackDay?track_id=" + trackId + "&day_id=" + dayId, "DELETE", null, requestHeaders);
+            response = httpConn.sendRequest(endPoint + "/deleteTrackDay?id=" + dayId, "DELETE", null, requestHeaders);
         } catch (Exception e) {
             e.printStackTrace();
         }

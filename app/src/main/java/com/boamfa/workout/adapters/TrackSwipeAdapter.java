@@ -31,10 +31,10 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
     private BaseActivity context;
     private List<TrackDay> objects;
     private int resource;
-    private int trackId;
+    private long trackId;
     private int textViewResourceId;
 
-    public TrackSwipeAdapter(Context context, int resource, int textViewResourceId, int trackId, List<TrackDay> objects) {
+    public TrackSwipeAdapter(Context context, int resource, int textViewResourceId, long trackId, List<TrackDay> objects) {
         this.trackId = trackId;
         this.context = (BaseActivity) context;
         this.objects = objects;
@@ -59,8 +59,7 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
             public void onClick(View view) {
                 swipeLayout.close(false);
 
-                DeleteTask task = new DeleteTask(trackId, objects.get(position).id);
-                task.execute();
+                context.db.deleteTrackDay(objects.get(position).id);
 
                 objects.remove(position);
                 notifyDataSetChanged();
@@ -80,7 +79,10 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
                         myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
                         String newDate = format.format(myCalendar.getTime());
-                        (new UpdateTask(trackId, objects.get(position), newDate)).execute();
+
+                        objects.get(position).date = newDate;
+                        context.db.updateTrackDay(objects.get(position));
+                        notifyDataSetChanged();
                     }
                 };
 
@@ -126,58 +128,5 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
     @Override
     public long getItemId(int position) {
         return position;
-    }
-
-    public class DeleteTask extends AppTask {
-        private int trackId;
-        private int trackDayId;
-
-        public DeleteTask(int trackId, int trackDayId) {
-            super(context);
-            this.trackId = trackId;
-            this.trackDayId = trackDayId;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            response = context.service.deleteTrackDay(trackId, trackDayId);
-            return true;
-        }
-
-        @Override
-        public void onSuccess(String response) {
-
-        }
-    }
-
-    public class UpdateTask extends AppTask {
-        private String date;
-        private int trackId;
-        private TrackDay trackDay;
-
-        public UpdateTask(int trackId, TrackDay trackDay, String date) {
-            super(context);
-            this.date = date;
-            this.trackId = trackId;
-            this.trackDay = trackDay;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            HashMap<String, String> postParams = new HashMap<String, String>();
-            postParams.put("track[id]", trackId + "");
-            postParams.put("track[track_days_attributes[][id]]", trackDay.id + "");
-            postParams.put("track[track_days_attributes[][date]]", date);
-            postParams.put("track[track_days_attributes[][track_id]]", trackId + "");
-
-            response = context.service.updateTrack(postParams);
-            return true;
-        }
-
-        @Override
-        public void onSuccess(String response) {
-            trackDay.date = date;
-            notifyDataSetChanged();
-        }
     }
 }

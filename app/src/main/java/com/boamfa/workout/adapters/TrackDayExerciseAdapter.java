@@ -71,7 +71,8 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
             @Override
             public void onClick(View view) {
                 swipeLayout.close(false);
-                (new DeleteTrackDayExerciseSetTask(groupPosition, childPosition)).execute();
+                context.getDBHandler().deleteTrackDayExerciseSet(groups.get(groupPosition).sets.get(childPosition).id);
+                groups.get(groupPosition).sets.remove(childPosition);
             }
         });
 
@@ -115,7 +116,9 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
             @Override
             public void onClick(View view) {
                 swipeLayout.close(false);
-                (new DeleteTrackDayExerciseTask(groupPosition)).execute();
+                context.getDBHandler().deleteTrackDayExercise(groups.get(groupPosition).id);
+                groups.remove(groupPosition);
+                notifyDataSetChanged();
             }
         });
 
@@ -131,8 +134,9 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
                         exercisesPopup.dismiss();
                         Exercise selectedExercise = context.getExerciseAdapter().getItem(position);
                         groups.get(groupPosition).name = selectedExercise.name;
+                        groups.get(groupPosition).exerciseId = selectedExercise.id;
+                        context.getDBHandler().updateTrackDayExercise(groups.get(groupPosition));
                         notifyDataSetChanged();
-                        (new UpdateTrackDayExerciseTask(groupPosition, selectedExercise.id)).execute();
                     }
                 });
             }
@@ -153,75 +157,6 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         // TODO Auto-generated method stub
         return true;
     }
-
-    public class DeleteTrackDayExerciseTask extends AppTask {
-        int position;
-
-        public DeleteTrackDayExerciseTask(int position) {
-            super((Context) context);
-            this.position = position;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            response = context.getService().deleteTrackDayExercise(groups.get(position).id);
-            return true;
-        }
-
-        @Override
-        public void onSuccess(String response) {
-            groups.remove(position);
-            notifyDataSetChanged();
-        }
-    }
-
-    public class UpdateTrackDayExerciseTask extends AppTask {
-        int position;
-        int exercise_id;
-
-        public UpdateTrackDayExerciseTask(int position, int exercise_id) {
-            super((Context) context);
-            this.position = position;
-            this.exercise_id = exercise_id;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            HashMap<String, String> postParams = new HashMap<String, String>();
-            postParams.put("id", groups.get(position).id + "");
-            postParams.put("exercise_id", exercise_id + "");
-            response = context.getService().updateTrackDayExercise(postParams);
-            return true;
-        }
-
-        @Override
-        public void onSuccess(String response) {
-        }
-    }
-
-    public class DeleteTrackDayExerciseSetTask extends AppTask {
-        int groupPosition;
-        int childPosition;
-
-        public DeleteTrackDayExerciseSetTask(int groupPosition, int childPosition) {
-            super((Context) context);
-            this.groupPosition = groupPosition;
-            this.childPosition = childPosition;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            response = context.getService().deleteTrackDayExerciseSet(groups.get(groupPosition).sets.get(childPosition).id);
-            return true;
-        }
-
-        @Override
-        public void onSuccess(String response) {
-            groups.get(groupPosition).sets.remove(childPosition);
-            notifyDataSetChanged();
-        }
-    }
-
 }
 
 

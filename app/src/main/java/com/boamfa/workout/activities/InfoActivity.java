@@ -7,13 +7,11 @@ import android.widget.PopupWindow;
 import com.boamfa.workout.adapters.ExercisesAdapter;
 import com.boamfa.workout.classes.User;
 import com.boamfa.workout.classes.UserLocalStore;
+import com.boamfa.workout.database.DatabaseHandler;
 import com.boamfa.workout.utils.AppService;
 
 public interface InfoActivity {
     ExercisesAdapter getExerciseAdapter();
-    AppService getService();
-
-    UserLocalStore getUserLocalStore();
 
     DrawerLayout getLayout();
 
@@ -21,5 +19,5 @@ public interface InfoActivity {
 
     ListView getExerciseListView();
 
-    String getAuthToken();
+    DatabaseHandler getDBHandler();
 }

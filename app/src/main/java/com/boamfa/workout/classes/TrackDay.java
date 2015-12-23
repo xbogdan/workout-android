@@ -8,12 +8,19 @@ import java.util.List;
  * Created by bogdan on 10/12/15.
  */
 public class TrackDay implements Serializable {
-    public int id;
+    public long id;
     public String name;
     public String date;
+    public long trackId;
     public ArrayList<TrackDayExercise> exercises;
 
-    public TrackDay(int id, String date) {
+    public TrackDay(String date, long trackId) {
+        this.trackId = trackId;
+        this.date = date;
+        this.setItems();
+    }
+
+    public TrackDay(long id, String date) {
         this.id = id;
         this.date = date;
         this.setItems();

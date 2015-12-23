@@ -12,7 +12,7 @@ import android.os.IBinder;
  */
 public class AuthenticatorService extends Service {
     private static final String TAG = "AuthenticatorService";
-    private static final String ACCOUNT_TYPE = "com.boamfa.workout.sync";
+    private static final String ACCOUNT_TYPE = "workout.com";
     public static final String ACCOUNT_NAME = "sync";
 
     private Authenticator mAuthenticator;

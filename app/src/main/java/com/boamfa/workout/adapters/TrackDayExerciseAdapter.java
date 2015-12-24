@@ -14,6 +14,7 @@ import com.boamfa.workout.classes.TrackDayExercise;
 import com.boamfa.workout.classes.TrackDayExerciseSet;
 import com.daimajia.swipe.SwipeLayout;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
@@ -94,7 +95,8 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         });
 
         TextView tv = (TextView) view.findViewById(R.id.surface_text_view);
-        tv.setText(child.reps + " reps  x  " + child.weight + " kg");
+        DecimalFormat df = new DecimalFormat("###.#");
+        tv.setText(df.format(child.weight) + " kg  x  " + child.reps + " reps");
 
         return view;
     }

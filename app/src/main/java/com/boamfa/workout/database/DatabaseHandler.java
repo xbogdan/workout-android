@@ -253,6 +253,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return id;
     }
 
+    public long updateTrackDayExerciseSet(TrackDayExerciseSet trackDayExerciseSet) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TrackDayExerciseSetEntry.COLUMN_WEIGHT, trackDayExerciseSet.weight);
+        values.put(TrackDayExerciseSetEntry.COLUMN_REPS, trackDayExerciseSet.reps);
+        return db.update(TrackDayExerciseSetEntry.TABLE_NAME, values, TrackDayExerciseSetEntry._ID + " = ?", new String[] { String.valueOf(trackDayExerciseSet.id) });
+    }
+
     public void deleteTrackDayExerciseSet(long id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TrackDayExerciseSetEntry.TABLE_NAME, TrackDayExerciseSetEntry._ID + " = ?",

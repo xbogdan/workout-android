@@ -247,7 +247,28 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
     }
 
     @Override
-    public void editChild() {
+    public void editChild(final int groupPosition, final int childPosition) {
+        showSetPopup();
+        final TrackDayExerciseSet trackDayExerciseSet = trackDayExercises.get(groupPosition).sets.get(childPosition);
+        final EditText weightField = (EditText) setPopup.getContentView().findViewById(R.id.set_weight);
+        final EditText repsField = (EditText) setPopup.getContentView().findViewById(R.id.set_reps);
 
+        weightField.setText(trackDayExerciseSet.weight + "");
+        repsField.setText(trackDayExerciseSet.reps + "");
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                closeSetPopup();
+
+                double weight = Double.parseDouble(weightField.getText().toString());
+                int reps = Integer.parseInt(repsField.getText().toString());
+
+                trackDayExerciseSet.reps = reps;
+                trackDayExerciseSet.weight = weight;
+                db.updateTrackDayExerciseSet(trackDayExerciseSet);
+                expandAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }

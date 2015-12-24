@@ -28,7 +28,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
 
         void addChild(int groupPosition);
         void deleteChild(int groupPosition, int childPosition);
-        void editChild(); // TODO implement
+        void editChild(int groupPosition, int childPosition);
 
         void showSetPopup();
         void closeSetPopup();
@@ -82,6 +82,14 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
             public void onClick(View view) {
                 swipeLayout.close(false);
                 actions.deleteChild(groupPosition, childPosition);
+            }
+        });
+
+        view.findViewById(R.id.edit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                swipeLayout.close(false);
+                actions.editChild(groupPosition, childPosition);
             }
         });
 

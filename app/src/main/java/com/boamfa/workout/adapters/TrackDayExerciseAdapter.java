@@ -2,39 +2,49 @@ package com.boamfa.workout.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.PopupWindow;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.boamfa.workout.R;
-import com.boamfa.workout.activities.InfoActivity;
-import com.boamfa.workout.classes.AppTask;
-import com.boamfa.workout.classes.Exercise;
 import com.boamfa.workout.classes.TrackDayExercise;
 import com.boamfa.workout.classes.TrackDayExerciseSet;
 import com.daimajia.swipe.SwipeLayout;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
+ * Adapter for track day exercises + sets
  * Created by bogdan on 30/11/15.
  */
 public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
 
-    private InfoActivity context;
-    private Activity activity;
-    private ArrayList<TrackDayExercise> groups;
+    public interface ExpandableListActions {
+        void deleteGroup(int groupPosition);
+        void editGroup(int groupPosition);
 
-    public TrackDayExerciseAdapter(Context context, ArrayList<TrackDayExercise> groups) {
-        this.context = (InfoActivity) context;
-        this.activity = (Activity) context;
+        void addChild(int groupPosition);
+        void deleteChild(int groupPosition, int childPosition);
+        void editChild(); // TODO implement
+
+        void showSetPopup();
+        void closeSetPopup();
+    }
+
+    private ArrayList<TrackDayExercise> groups;
+    private ExpandableListActions actions;
+    private Context context;
+
+    public TrackDayExerciseAdapter(ExpandableListActions actions, ArrayList<TrackDayExercise> groups) {
+        this.actions = actions;
+        this.context = (Context) actions;
         this.groups = groups;
+    }
+
+    public void setActions(ExpandableListActions actions) {
     }
 
     public void addItem(TrackDayExerciseSet item, TrackDayExercise group) {
@@ -59,7 +69,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
     public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View view, ViewGroup parent) {
         TrackDayExerciseSet child = (TrackDayExerciseSet) getChild(groupPosition, childPosition);
         if (view == null) {
-            LayoutInflater inflater = (LayoutInflater) activity.getSystemService(activity.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.expandlist_set, null);
         }
 
@@ -71,8 +81,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
             @Override
             public void onClick(View view) {
                 swipeLayout.close(false);
-                context.getDBHandler().deleteTrackDayExerciseSet(groups.get(groupPosition).sets.get(childPosition).id);
-                groups.get(groupPosition).sets.remove(childPosition);
+                actions.deleteChild(groupPosition, childPosition);
             }
         });
 
@@ -86,7 +95,6 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         ArrayList<TrackDayExerciseSet> chList = groups.get(groupPosition).sets;
 
         return chList.size();
-
     }
 
     public Object getGroup(int groupPosition) {
@@ -104,7 +112,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
     public View getGroupView(final int groupPosition, boolean isLastChild, View view, ViewGroup parent) {
         TrackDayExercise group = (TrackDayExercise) getGroup(groupPosition);
         if (view == null) {
-            LayoutInflater inflater = (LayoutInflater) activity.getSystemService(activity.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.expandlist_exercise, null);
         }
 
@@ -116,9 +124,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
             @Override
             public void onClick(View view) {
                 swipeLayout.close(false);
-                context.getDBHandler().deleteTrackDayExercise(groups.get(groupPosition).id);
-                groups.remove(groupPosition);
-                notifyDataSetChanged();
+                actions.deleteGroup(groupPosition);
             }
         });
 
@@ -126,24 +132,20 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
             @Override
             public void onClick(View view) {
                 swipeLayout.close(false);
-                final PopupWindow exercisesPopup = context.getExercisePopup();
-                exercisesPopup.showAtLocation(context.getLayout(), Gravity.CENTER, 0, 0);
-                context.getExerciseListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        exercisesPopup.dismiss();
-                        Exercise selectedExercise = context.getExerciseAdapter().getItem(position);
-                        groups.get(groupPosition).name = selectedExercise.name;
-                        groups.get(groupPosition).exerciseId = selectedExercise.id;
-                        context.getDBHandler().updateTrackDayExercise(groups.get(groupPosition));
-                        notifyDataSetChanged();
-                    }
-                });
+                actions.editGroup(groupPosition);
             }
         });
 
         TextView tv = (TextView) view.findViewById(R.id.surface_text_view);
         tv.setText(group.name);
+
+        Button addSetbutton = (Button) view.findViewById(R.id.add_set);
+        addSetbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                actions.addChild(groupPosition);
+            }
+        });
 
         return view;
     }

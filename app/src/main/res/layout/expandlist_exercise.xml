@@ -61,6 +61,7 @@
             android:layout_height="match_parent" />
 
         <Button
+            android:id="@+id/add_set"
             android:text="add set"
             android:textSize="10dp"
             android:textColor="#27ae60"

@@ -232,12 +232,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                TrackDayExerciseSet element = new TrackDayExerciseSet(Long.parseLong(cursor.getString(0)), Integer.parseInt(cursor.getString(1)), Double.parseDouble(cursor.getString(2)));
+                TrackDayExerciseSet element = new TrackDayExerciseSet(Long.parseLong(cursor.getString(0)), Integer.parseInt(cursor.getString(1)), Double.parseDouble(cursor.getString(2)), trackDayExerciseId);
                 list.add(element);
             } while (cursor.moveToNext());
         }
 
         return list;
+    }
+
+    public long addTrackDayExerciseSet(TrackDayExerciseSet trackDayExerciseSet) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TrackDayExerciseSetEntry.COLUMN_WEIGHT, trackDayExerciseSet.weight);
+        values.put(TrackDayExerciseSetEntry.COLUMN_REPS, trackDayExerciseSet.reps);
+        values.put(TrackDayExerciseSetEntry.COLUMN_TRACK_DAY_EXERCISE_ID, trackDayExerciseSet.trackDayExerciseId);
+
+        // Inserting Row
+        long id = db.insert(TrackDayExerciseSetEntry.TABLE_NAME, null, values);
+        db.close();
+        return id;
     }
 
     public void deleteTrackDayExerciseSet(long id) {

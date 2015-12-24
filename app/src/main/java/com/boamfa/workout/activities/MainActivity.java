@@ -1,19 +1,17 @@
 package com.boamfa.workout.activities;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import com.boamfa.workout.R;
-import com.boamfa.workout.classes.User;
-import com.boamfa.workout.classes.UserLocalStore;
 import com.boamfa.workout.utils.AppService;
 
 import java.io.IOException;
@@ -23,6 +21,13 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        db.addExercise("Dumbell curl");
+//        db.addExercise("Barbell curl");
+//        db.addExercise("Incline press");
+//        db.addExercise("Pullups");
+//        db.addExercise("Chinups");
+//        db.addExercise("Dumbell rows");
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View contentView = inflater.inflate(R.layout.activity_main, null, false);
@@ -41,18 +46,30 @@ public class MainActivity extends BaseActivity {
         } else {
             currentAccount = availableAccounts[0];
             final AccountManagerFuture<Bundle> future = accountManager.getAuthToken(currentAccount, authTokenType, null, this, null, null);
-            try {
-                authToken = future.getResult().getString("authtoken");
-            } catch (OperationCanceledException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (AuthenticatorException e) {
-                e.printStackTrace();
-            }
-            service = new AppService(authToken);
-            Intent i = new Intent(MainActivity.this, TracksActivity.class);
-            startActivity(i);
+            (new AsyncTask<Void, Void, String>() {
+                @Override
+                protected String doInBackground(Void... params) {
+                    String token = null;
+                    try {
+                        token = future.getResult().getString("authtoken");
+                    } catch (OperationCanceledException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (AuthenticatorException e) {
+                        e.printStackTrace();
+                    }
+                    return token;
+                }
+                @Override
+                protected void onPostExecute(String token) {
+                    authToken = token;
+                    service = new AppService(authToken);
+                    Intent i = new Intent(MainActivity.this, TracksActivity.class);
+                    startActivity(i);
+                }
+
+            }).execute();
         }
     }
 }

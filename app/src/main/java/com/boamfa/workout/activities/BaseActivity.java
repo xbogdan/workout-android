@@ -62,12 +62,6 @@ public class BaseActivity extends AppCompatActivity {
 
 //        db.print();
 //        db.reinstall();
-//        db.addExercise("Dumbell curl");
-//        db.addExercise("Barbell curl");
-//        db.addExercise("Incline press");
-//        db.addExercise("Pullups");
-//        db.addExercise("Chinups");
-//        db.addExercise("Dumbell rows");
 
         Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar(toolbar);

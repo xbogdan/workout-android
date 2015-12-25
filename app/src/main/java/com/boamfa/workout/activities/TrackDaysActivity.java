@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -64,8 +65,29 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
 
         expandListView = (ExpandableListView) findViewById(R.id.expandableList);
         expandAdapter = new TrackDayExerciseAdapter(TrackDaysActivity.this, trackDayExercises);
-        expandAdapter.setActions(this);
         expandListView.setAdapter(expandAdapter);
+        expandListView.setGroupIndicator(null);
+        expandListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+            @Override
+            public void onGroupCollapse(int groupPosition) {
+
+            }
+        });
+        expandListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                ImageView groupIndicator = (ImageView) v.findViewById(R.id.group_indicator);
+                if (trackDayExercises.get(groupPosition).sets.size() > 0) {
+                    groupIndicator.setImageAlpha(1000); // TODO fix version compatibility
+                    if (parent.isGroupExpanded(groupPosition)) {
+                        groupIndicator.setImageDrawable(getResources().getDrawable(R.drawable.arrow_right));
+                    } else {
+                        groupIndicator.setImageDrawable(getResources().getDrawable(R.drawable.arrow_down));
+                    }
+                }
+                return false;
+            }
+        });
 
         /**
          * Setup exercises list
@@ -218,7 +240,7 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
     }
 
     @Override
-    public void addChild(final int groupPosition) {
+    public void addChild(final int groupPosition, final ImageView groupIndicator) {
         showSetPopup();
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -235,6 +257,7 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
                 trackDayExerciseSet.id = db.addTrackDayExerciseSet(trackDayExerciseSet);
                 trackDayExercises.get(groupPosition).sets.add(trackDayExerciseSet);
                 expandAdapter.notifyDataSetChanged();
+                groupIndicator.setImageAlpha(1000); // TODO fix version compatibility
             }
         });
     }

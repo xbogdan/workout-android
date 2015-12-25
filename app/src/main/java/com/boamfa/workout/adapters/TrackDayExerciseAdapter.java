@@ -1,12 +1,12 @@
 package com.boamfa.workout.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.boamfa.workout.R;
@@ -27,7 +27,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         void deleteGroup(int groupPosition);
         void editGroup(int groupPosition);
 
-        void addChild(int groupPosition);
+        void addChild(int groupPosition, ImageView groupIndicator);
         void deleteChild(int groupPosition, int childPosition);
         void editChild(int groupPosition, int childPosition);
 
@@ -43,9 +43,6 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         this.actions = actions;
         this.context = (Context) actions;
         this.groups = groups;
-    }
-
-    public void setActions(ExpandableListActions actions) {
     }
 
     public void addItem(TrackDayExerciseSet item, TrackDayExercise group) {
@@ -102,9 +99,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
     }
 
     public int getChildrenCount(int groupPosition) {
-        ArrayList<TrackDayExerciseSet> chList = groups.get(groupPosition).sets;
-
-        return chList.size();
+        return groups.get(groupPosition).sets.size();
     }
 
     public Object getGroup(int groupPosition) {
@@ -124,6 +119,14 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.expandlist_exercise, null);
+        }
+
+        final ImageView groupIndicator = (ImageView) view.findViewById(R.id.group_indicator);
+        if (groupIndicator.getDrawable() == null) {
+            groupIndicator.setImageDrawable(context.getResources().getDrawable(R.drawable.arrow_right));
+            if (groups.get(groupPosition).sets.size() == 0) {
+                groupIndicator.setImageAlpha(0); // TODO fix version compatibility
+            }
         }
 
         final SwipeLayout swipeLayout = (SwipeLayout) view.findViewById(R.id.swipe);
@@ -153,7 +156,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         addSetbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                actions.addChild(groupPosition);
+                actions.addChild(groupPosition, groupIndicator);
             }
         });
 

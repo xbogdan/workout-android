@@ -12,6 +12,10 @@ import com.boamfa.workout.classes.TrackDay;
 import com.boamfa.workout.classes.TrackDayExercise;
 import com.boamfa.workout.classes.TrackDayExerciseSet;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static com.boamfa.workout.database.DatabaseContract.*;
@@ -38,6 +42,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(TrackDayExerciseSetEntry.SQL_CREATE_ENTRIES);
         db.execSQL(ExerciseEntry.SQL_CREATE_ENTRIES);
         db.execSQL(MuscleGroupEntry.SQL_CREATE_ENTRIES);
+        db.execSQL(HistoryEntry.SQL_CREATE_ENTRIES);
     }
 
     @Override
@@ -49,6 +54,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(TrackDayExerciseSetEntry.SQL_DELETE_ENTRIES);
         db.execSQL(ExerciseEntry.SQL_DELETE_ENTRIES);
         db.execSQL(MuscleGroupEntry.SQL_DELETE_ENTRIES);
+        db.execSQL(HistoryEntry.SQL_DELETE_ENTRIES);
 
         // Create tables again
         onCreate(db);
@@ -62,19 +68,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(TrackDayExerciseSetEntry.SQL_DELETE_ENTRIES);
         db.execSQL(ExerciseEntry.SQL_DELETE_ENTRIES);
         db.execSQL(MuscleGroupEntry.SQL_DELETE_ENTRIES);
+        db.execSQL(HistoryEntry.SQL_DELETE_ENTRIES);
 
         onCreate(db);
     }
 
-    public void print() {
-        System.out.println(TrackEntry.SQL_CREATE_ENTRIES);
-        System.out.println(TrackDayEntry.SQL_CREATE_ENTRIES);
-        System.out.println(TrackDayExerciseEntry.SQL_CREATE_ENTRIES);
-        System.out.println(TrackDayExerciseSetEntry.SQL_CREATE_ENTRIES);
-        System.out.println(ExerciseEntry.SQL_CREATE_ENTRIES);
-        System.out.println(MuscleGroupEntry.SQL_CREATE_ENTRIES);
-    }
 
+    /**
+     * Track
+     */
     public ArrayList<Track> getTracks() {
         SQLiteDatabase db = this.getWritableDatabase();
         ArrayList<Track> list = new ArrayList<Track>();
@@ -93,19 +95,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return list;
     }
 
-    public void getTrack(long trackId) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String selectQuery = "SELECT _id, name FROM " + TrackEntry.TABLE_NAME + " WHERE _id";
-    }
-
     public long addTrack(Track track) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TrackEntry.COLUMN_NAME, track.name);
 
+        String obj = serializeToString(track);
+        addHistory(TrackEntry.TABLE_NAME, obj, "insert", db);
+
         // Inserting Row
         long id = db.insert(TrackEntry.TABLE_NAME, null, values);
         db.close();
+
         return id;
     }
 
@@ -113,28 +114,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TrackEntry.COLUMN_NAME, track.name);
+
+        String obj = serializeToString(track);
+        addHistory(TrackEntry.TABLE_NAME, obj, "update", db);
+
         return db.update(TrackEntry.TABLE_NAME, values, TrackEntry._ID + " = ?", new String[] { String.valueOf(track.id) });
     }
 
     public void deleteTrack(long id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TrackEntry.TABLE_NAME, TrackEntry._ID + " = ?",
-                new String[]{id + ""});
+
+        addHistory(TrackEntry.TABLE_NAME, id + "", "delete", db);
+
+        db.delete(TrackEntry.TABLE_NAME, TrackEntry._ID + " = ?", new String[]{id + ""});
         db.close();
     }
 
-    public long addTrackDay(TrackDay trackDay) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(TrackDayEntry.COLUMN_DATE, trackDay.date);
-        values.put(TrackDayEntry.COLUMN_TRACK_ID, trackDay.trackId);
 
-        // Inserting Row
-        long id = db.insert(TrackDayEntry.TABLE_NAME, null, values);
-        db.close();
-        return id;
-    }
-
+    /**
+     * Track Day
+     */
     public ArrayList<TrackDay> getTrackDays(long trackId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ArrayList<TrackDay> list = new ArrayList<TrackDay>();
@@ -153,32 +152,45 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return list;
     }
 
+    public long addTrackDay(TrackDay trackDay) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TrackDayEntry.COLUMN_DATE, trackDay.date);
+        values.put(TrackDayEntry.COLUMN_TRACK_ID, trackDay.trackId);
+
+        String obj = serializeToString(trackDay);
+        addHistory(TrackDayEntry.TABLE_NAME, obj, "insert", db);
+
+        // Inserting Row
+        long id = db.insert(TrackDayEntry.TABLE_NAME, null, values);
+        db.close();
+        return id;
+    }
+
     public long updateTrackDay(TrackDay trackDay) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TrackDayEntry.COLUMN_DATE, trackDay.date);
+
+        String obj = serializeToString(trackDay);
+        addHistory(TrackDayEntry.TABLE_NAME, obj, "update", db);
+
         return db.update(TrackDayEntry.TABLE_NAME, values, TrackDayEntry._ID + " = ?", new String[] { String.valueOf(trackDay.id) });
     }
 
     public void deleteTrackDay(long id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TrackDayEntry.TABLE_NAME, TrackDayEntry._ID + " = ?",
-                new String[]{id + ""});
+
+        addHistory(TrackDayEntry.TABLE_NAME, id + "", "delete", db);
+
+        db.delete(TrackDayEntry.TABLE_NAME, TrackDayEntry._ID + " = ?", new String[]{id + ""});
         db.close();
     }
 
-    public long addTrackDayExercise(TrackDayExercise trackDayExercise) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(TrackDayExerciseEntry.COLUMN_EXERCISE_ID, trackDayExercise.exerciseId);
-        values.put(TrackDayExerciseEntry.COLUMN_TRACK_DAY_ID, trackDayExercise.trackDayId);
 
-        // Inserting Row
-        long id = db.insert(TrackDayExerciseEntry.TABLE_NAME, null, values);
-        db.close();
-        return id;
-    }
-
+    /**
+     * Track Day Exercise
+     */
     public ArrayList<TrackDayExercise> getTrackDayExercises(long trackDayId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ArrayList<TrackDayExercise> list = new ArrayList<TrackDayExercise>();
@@ -208,20 +220,45 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return list;
     }
 
-    public void deleteTrackDayExercise(long id) {
+    public long addTrackDayExercise(TrackDayExercise trackDayExercise) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TrackDayExerciseEntry.TABLE_NAME, TrackDayExerciseEntry._ID + " = ?",
-                new String[]{id + ""});
+        ContentValues values = new ContentValues();
+        values.put(TrackDayExerciseEntry.COLUMN_EXERCISE_ID, trackDayExercise.exerciseId);
+        values.put(TrackDayExerciseEntry.COLUMN_TRACK_DAY_ID, trackDayExercise.trackDayId);
+
+        String obj = serializeToString(trackDayExercise);
+        addHistory(TrackDayExerciseEntry.TABLE_NAME, obj, "insert", db);
+
+        // Inserting Row
+        long id = db.insert(TrackDayExerciseEntry.TABLE_NAME, null, values);
         db.close();
+        return id;
     }
 
     public long updateTrackDayExercise(TrackDayExercise trackDayExercise) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TrackDayExerciseEntry.COLUMN_EXERCISE_ID, trackDayExercise.exerciseId);
+
+        String obj = serializeToString(trackDayExercise);
+        addHistory(TrackDayExerciseEntry.TABLE_NAME, obj, "update", db);
+
         return db.update(TrackDayExerciseEntry.TABLE_NAME, values, TrackDayExerciseEntry._ID + " = ?", new String[] { String.valueOf(trackDayExercise.id) });
     }
 
+    public void deleteTrackDayExercise(long id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        addHistory(TrackDayExerciseEntry.TABLE_NAME, id + "", "delete", db);
+
+        db.delete(TrackDayExerciseEntry.TABLE_NAME, TrackDayExerciseEntry._ID + " = ?", new String[]{id + ""});
+        db.close();
+    }
+
+
+    /**
+     * Track Day Exercise Set
+     */
     public ArrayList<TrackDayExerciseSet> getSets(long trackDayExerciseId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ArrayList<TrackDayExerciseSet> list = new ArrayList<TrackDayExerciseSet>();
@@ -247,6 +284,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(TrackDayExerciseSetEntry.COLUMN_REPS, trackDayExerciseSet.reps);
         values.put(TrackDayExerciseSetEntry.COLUMN_TRACK_DAY_EXERCISE_ID, trackDayExerciseSet.trackDayExerciseId);
 
+        String obj = serializeToString(trackDayExerciseSet);
+        addHistory(TrackDayExerciseSetEntry.TABLE_NAME, obj, "insert", db);
+
         // Inserting Row
         long id = db.insert(TrackDayExerciseSetEntry.TABLE_NAME, null, values);
         db.close();
@@ -258,20 +298,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(TrackDayExerciseSetEntry.COLUMN_WEIGHT, trackDayExerciseSet.weight);
         values.put(TrackDayExerciseSetEntry.COLUMN_REPS, trackDayExerciseSet.reps);
+
+        String obj = serializeToString(trackDayExerciseSet);
+        addHistory(TrackDayExerciseSetEntry.TABLE_NAME, obj, "update", db);
+
         return db.update(TrackDayExerciseSetEntry.TABLE_NAME, values, TrackDayExerciseSetEntry._ID + " = ?", new String[] { String.valueOf(trackDayExerciseSet.id) });
     }
 
     public void deleteTrackDayExerciseSet(long id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TrackDayExerciseSetEntry.TABLE_NAME, TrackDayExerciseSetEntry._ID + " = ?",
-                new String[]{id + ""});
+
+        addHistory(TrackDayExerciseSetEntry.TABLE_NAME, id + "", "delete", db);
+
+        db.delete(TrackDayExerciseSetEntry.TABLE_NAME, TrackDayExerciseSetEntry._ID + " = ?", new String[]{id + ""});
         db.close();
     }
 
+
+    /**
+     * Exercises
+     */
     public long addExercise(String name) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(ExerciseEntry.COLUMN_NAME, name);
+
+        // TODO create
+//        String obj = serializeToString(trackDayExerciseSet);
+//        addHistory(ExerciseEntry.TABLE_NAME, obj, "insert", db);
 
         // Inserting Row
         long id = db.insert(ExerciseEntry.TABLE_NAME, null, values);
@@ -295,5 +349,48 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         return list;
+    }
+
+
+    /**
+     * History
+     */
+    public long addHistory(String tableName, String content, String operation, SQLiteDatabase db) {
+        Boolean wasNull = false;
+        if (db == null) {
+            wasNull = true;
+            db = this.getWritableDatabase();
+        }
+        ContentValues values = new ContentValues();
+        values.put(HistoryEntry.COLUMN_TABLE_NAME, tableName);
+        values.put(HistoryEntry.COLUMN_CONTENT, content);
+        values.put(HistoryEntry.COLUMN_OPERATION, operation);
+
+        // Inserting Row
+        long id = db.insert(HistoryEntry.TABLE_NAME, null, values);
+        if (wasNull) {
+            db.close();
+        }
+        return id;
+    }
+
+    public void deleteHistory(long id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(HistoryEntry.TABLE_NAME, HistoryEntry._ID + " = ?", new String[]{id + ""});
+        db.close();
+    }
+
+    public String serializeToString(Serializable obj) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream() ;
+        ObjectOutputStream out = null;
+        try {
+            out = new ObjectOutputStream(bos);
+            out.writeObject(obj);
+            out.close();
+            return out.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "ERROR";
+        }
     }
 }

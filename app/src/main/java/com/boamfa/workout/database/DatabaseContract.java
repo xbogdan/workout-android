@@ -116,4 +116,28 @@ public final class DatabaseContract {
         public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + MuscleGroupEntry.TABLE_NAME;
     }
+
+    /**
+     * History table
+     */
+
+    public static abstract class HistoryEntry implements BaseColumns {
+        public static final String TABLE_NAME = "history";
+        public static final String COLUMN_TABLE_NAME = "table_name";
+        public static final String COLUMN_CONTENT = "content";
+        public static final String COLUMN_OPERATION = "operation";
+        public static final String COLUMN_TIMESTAMP = "timestamp";
+
+        public static final String SQL_CREATE_ENTRIES =
+                "CREATE TABLE " + HistoryEntry.TABLE_NAME + " (" +
+                    HistoryEntry._ID + " INTEGER PRIMARY KEY, " +
+                    HistoryEntry.COLUMN_TABLE_NAME + " TEXT, " +
+                    HistoryEntry.COLUMN_CONTENT + " TEXT, " +
+                    HistoryEntry.COLUMN_OPERATION + " TEXT, " +
+                    HistoryEntry.COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP " +
+                ");" ;
+
+        public static final String SQL_DELETE_ENTRIES =
+            "DROP TABLE IF EXISTS " + HistoryEntry.TABLE_NAME;
+    }
 }

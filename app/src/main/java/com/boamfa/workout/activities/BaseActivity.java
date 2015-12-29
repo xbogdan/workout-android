@@ -60,9 +60,6 @@ public class BaseActivity extends AppCompatActivity {
         accountManager = AccountManager.get(this);
         db = new DatabaseHandler(this);
 
-//        db.print();
-//        db.reinstall();
-
         Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

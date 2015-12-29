@@ -22,6 +22,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+//        db.reinstall();
 //        db.addExercise("Dumbell curl");
 //        db.addExercise("Barbell curl");
 //        db.addExercise("Incline press");

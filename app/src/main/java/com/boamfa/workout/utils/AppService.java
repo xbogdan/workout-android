@@ -12,6 +12,7 @@ public class AppService {
 //    private static final String endPoint = "http://10.0.2.2:3000/api/v1";
 //    private static final String endPoint = "http://192.168.1.218:3000/api/v1";
     private static final String endPoint = "http://192.168.0.11:3000/api/v1";
+//    private static final String endPoint = "http://workout-api.boamfa.cgom/api/v1";
     private static final HttpCaller httpConn = new HttpCaller(false);
     public static String authToken;
 

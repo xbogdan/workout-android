@@ -62,13 +62,13 @@ public class Authenticator extends AbstractAccountAuthenticator {
             if (password != null) {
                 AppService service = new AppService();
                 Pair<Integer, String> res = service.login(account.name, password);
-                try {
-                    JSONObject jsonResponse = new JSONObject(res.second);
-                    //User user = new User(jsonResponse.getInt("id"), jsonResponse.getString("email"), jsonResponse.getString("auth_token"));
-
-                    authToken = jsonResponse.getString("auth_token");
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if (res.first != 401) {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(res.second);
+                        authToken = jsonResponse.getString("auth_token");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

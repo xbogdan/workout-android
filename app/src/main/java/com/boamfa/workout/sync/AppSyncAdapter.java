@@ -3,14 +3,36 @@ package com.boamfa.workout.sync;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
+import android.util.Pair;
 
 import com.boamfa.workout.R;
+import com.boamfa.workout.activities.MainActivity;
+import com.boamfa.workout.activities.TrackDaysActivity;
+import com.boamfa.workout.classes.History;
+import com.boamfa.workout.classes.Track;
+import com.boamfa.workout.classes.TrackDay;
+import com.boamfa.workout.classes.TrackDayExercise;
+import com.boamfa.workout.classes.TrackDayExerciseSet;
+import com.boamfa.workout.database.DatabaseContract;
+import com.boamfa.workout.database.DatabaseHandler;
 import com.boamfa.workout.utils.AppService;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by bogdan on 21/12/15.
@@ -18,24 +40,313 @@ import com.boamfa.workout.utils.AppService;
 public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
     private static AccountManager accountManager;
     private static AppService service;
+    private static String accountType;
+    private static String authTokenType;
+    private static Context context;
+    private static DatabaseHandler db;
 
     public AppSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
+
+        this.context = context;
+
         accountManager = AccountManager.get(context);
-        final String accountType = context.getString(R.string.accountType);
-        final String authTokenType = context.getString(R.string.authTokenType);
-        Account availableAccounts[] = accountManager.getAccountsByType(accountType);
-        final Account currentAccount = availableAccounts[0];
-//        final AccountManagerFuture<Bundle> future = accountManager.getAuthToken(currentAccount, authTokenType, null, context, null, null);
-//        String authToken;
-//        try {
-//            authToken = future.getResult().getString("authtoken");
-//        }
-//        service = new AppService();
+        accountType = context.getString(R.string.accountType);
+        authTokenType = context.getString(R.string.authTokenType);
+
+        db = new DatabaseHandler(context);
     }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+        AccountManagerFuture<Bundle> future = accountManager.getAuthToken(account, authTokenType, null, null, null, null);
 
+        String authToken = null;
+        try {
+            authToken = future.getResult().getString("authtoken");
+            service = new AppService(authToken);
+
+
+            /**
+             * Syncing exercises
+             */
+            Pair<Integer, String> response = service.getExercises();
+            if (response.first == 200) {
+                try {
+                    JSONObject jsonResponse = new JSONObject(response.second);
+                    JSONArray exercises = jsonResponse.getJSONArray("exercises");
+
+                    for (int i = 0, exNr = exercises.length(); i < exNr; i++) {
+                        JSONObject ex = exercises.getJSONObject(i);
+                        long serverId = ex.getInt("id");
+
+                        if (!db.checkExerciseSync(serverId)) {
+                            long id = db.addExercise(ex.getString("name"), ex.getInt("muscle_group_id"));
+                            db.setSyncId(id, DatabaseContract.ExerciseEntry.TABLE_NAME, serverId);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            ArrayList<History> list = db.getAllHistory();
+            for (int i = 0, len = list.size(); i < len; i++) {
+                History element = list.get(i);
+
+
+                /**
+                 * TRACK
+                 */
+                if (element.tableName.equals(DatabaseContract.TrackEntry.TABLE_NAME)) {
+                    if (element.operation.equals("insert") || element.operation.equals("update")) {
+                        ByteArrayInputStream bis = new ByteArrayInputStream(element.content);
+                        ObjectInputStream in = new ObjectInputStream(bis);
+                        Track obj;
+                        try {
+                            obj = (Track) in.readObject();
+                            in.close();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                            continue;
+                        }
+
+                        // INSERT
+                        if (element.operation.equals("insert")) {
+                            Pair<Integer, String> res = service.createTrack(obj.name);
+                            if (res.first == 201) {
+                                try {
+                                    JSONObject json = new JSONObject(res.second);
+                                    int trackId = json.getInt("track_id");
+                                    db.setSyncId(element.local_id, element.tableName, trackId);
+                                    db.deleteHistory(element.id);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                        // UPDATE
+                        if (element.operation.equals("update")) {
+                            long serverId = db.getSyncId(element.local_id, element.tableName);
+
+                            HashMap<String, String> postParams = new HashMap<String, String>();
+                            postParams.put("track[id]", serverId+"");
+                            postParams.put("track[name]", obj.name);
+
+                            Pair<Integer, String> res = service.updateTrack(postParams);
+                            if (res.first == 200) {
+                                db.deleteHistory(element.id);
+                            }
+                        }
+                    }
+
+                    // DELETE
+                    if (element.operation.equals("delete")) {
+                        long serverId = db.getSyncId(element.local_id, DatabaseContract.TrackEntry.TABLE_NAME);
+                        Pair<Integer, String> res = service.deleteTrack(serverId);
+                        if (res.first == 200) {
+                            db.deleteSyncEntry(element.local_id, element.tableName);
+                            db.deleteHistory(element.id);
+                        }
+                    }
+                }
+
+
+                /**
+                 * TRACK DAY
+                 */
+                if (element.tableName.equals(DatabaseContract.TrackDayEntry.TABLE_NAME)) {
+                    if (element.operation.equals("insert") || element.operation.equals("update")) {
+                        ByteArrayInputStream bis = new ByteArrayInputStream(element.content);
+                        ObjectInputStream in = new ObjectInputStream(bis);
+                        TrackDay obj;
+                        try {
+                            obj = (TrackDay) in.readObject();
+                            in.close();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                            continue;
+                        }
+
+                        // INSERT
+                        if (element.operation.equals("insert")) {
+                            long trackServerId = db.getSyncId(obj.trackId, DatabaseContract.TrackEntry.TABLE_NAME);
+                            Pair<Integer, String> res = service.createTrackDay(trackServerId, obj.date);
+                            if (res.first == 201) {
+                                try {
+                                    JSONObject json = new JSONObject(res.second);
+                                    int serverId = json.getInt("day_id");
+                                    db.setSyncId(element.local_id, element.tableName, serverId);
+                                    db.deleteHistory(element.id);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                        // UPDATE
+                        if (element.operation.equals("update")) {
+                            long serverId = db.getSyncId(element.local_id, element.tableName);
+
+                            HashMap<String, String> postParams = new HashMap<String, String>();
+                            postParams.put("id", serverId+"");
+                            postParams.put("date", obj.date);
+
+                            Pair<Integer, String> res = service.updateTrackDay(postParams);
+                            if (res.first == 200) {
+                                db.deleteHistory(element.id);
+                            }
+                        }
+                    }
+
+                    // DELETE
+                    if (element.operation.equals("delete")) {
+                        long serverId = db.getSyncId(element.local_id, element.tableName);
+                        Pair<Integer, String> res = service.deleteTrackDay(serverId);
+                        if (res.first == 200) {
+                            db.deleteSyncEntry(element.local_id, element.tableName);
+                            db.deleteHistory(element.id);
+                        }
+                    }
+                }
+
+
+                /**
+                 * TRACK DAY EXERCISE
+                 */
+                if (element.tableName.equals(DatabaseContract.TrackDayExerciseEntry.TABLE_NAME)) {
+                    if (element.operation.equals("insert") || element.operation.equals("update")) {
+                        ByteArrayInputStream bis = new ByteArrayInputStream(element.content);
+                        ObjectInputStream in = new ObjectInputStream(bis);
+                        TrackDayExercise obj;
+                        try {
+                            obj = (TrackDayExercise) in.readObject();
+                            in.close();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                            continue;
+                        }
+
+                        // INSERT
+                        if (element.operation.equals("insert")) {
+                            long serverExerciseId = db.getSyncId(obj.exerciseId, DatabaseContract.ExerciseEntry.TABLE_NAME);
+                            long serverTrackDayId = db.getSyncId(obj.trackDayId, DatabaseContract.TrackDayEntry.TABLE_NAME);
+                            Pair<Integer, String> res = service.createTrackDayExercise(serverTrackDayId, serverExerciseId);
+                            if (res.first == 201) {
+                                try {
+                                    JSONObject json = new JSONObject(res.second);
+                                    int serverId = json.getInt("track_day_exercise_id");
+                                    db.setSyncId(element.local_id, element.tableName, serverId);
+                                    db.deleteHistory(element.id);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                        // UPDATE
+                        if (element.operation.equals("update")) {
+                            long serverId = db.getSyncId(element.local_id, element.tableName);
+                            long serverExerciseId = db.getSyncId(obj.exerciseId, DatabaseContract.ExerciseEntry.TABLE_NAME);
+
+                            HashMap<String, String> postParams = new HashMap<String, String>();
+                            postParams.put("id", serverId+"");
+                            postParams.put("exercise_id", serverExerciseId+"");
+
+                            Pair<Integer, String> res = service.updateTrackDayExercise(postParams);
+                            if (res.first == 200) {
+                                db.deleteHistory(element.id);
+                            }
+                        }
+                    }
+
+                    // DELETE
+                    if (element.operation.equals("delete")) {
+                        long serverId = db.getSyncId(element.local_id, element.tableName);
+                        Pair<Integer, String> res = service.deleteTrackDayExercise(serverId);
+                        if (res.first == 200) {
+                            db.deleteSyncEntry(element.local_id, element.tableName);
+                            db.deleteHistory(element.id);
+                        }
+                    }
+                }
+
+
+                /**
+                 * TRACK DAY EXERCISE SET
+                 */
+                if (element.tableName.equals(DatabaseContract.TrackDayExerciseSetEntry.TABLE_NAME)) {
+                    if (element.operation.equals("insert") || element.operation.equals("update")) {
+                        ByteArrayInputStream bis = new ByteArrayInputStream(element.content);
+                        ObjectInputStream in = new ObjectInputStream(bis);
+                        TrackDayExerciseSet obj;
+                        try {
+                            obj = (TrackDayExerciseSet) in.readObject();
+                            in.close();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                            continue;
+                        }
+
+                        // INSERT
+                        if (element.operation.equals("insert")) {
+                            long serverTrackDayExerciseId = db.getSyncId(obj.trackDayExerciseId, DatabaseContract.TrackDayExerciseEntry.TABLE_NAME);
+
+                            HashMap<String, String> postParams = new HashMap<String, String>();
+                            postParams.put("track_day_exercise_id", serverTrackDayExerciseId+"");
+                            postParams.put("reps", obj.reps+"");
+                            postParams.put("weight", obj.weight+"");
+
+                            Pair<Integer, String> res = service.createTrackDayExerciseSet(postParams);
+                            if (res.first == 201) {
+                                try {
+                                    JSONObject json = new JSONObject(res.second);
+                                    int serverId = json.getInt("track_id");
+                                    db.setSyncId(element.local_id, element.tableName, serverId);
+                                    db.deleteHistory(element.id);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                        // UPDATE
+                        if (element.operation.equals("update")) {
+                            long serverId = db.getSyncId(element.local_id, element.tableName);
+
+                            HashMap<String, String> postParams = new HashMap<String, String>();
+                            postParams.put("id", serverId+"");
+                            postParams.put("reps", obj.reps+"");
+                            postParams.put("weight", obj.weight+"");
+
+                            Pair<Integer, String> res = service.updateTrackDayExerciseSet(postParams);
+                            if (res.first == 200) {
+                                db.deleteHistory(element.id);
+                            }
+                        }
+                    }
+
+                    // DELETE
+                    if (element.operation.equals("delete")) {
+                        long serverId = db.getSyncId(element.local_id, element.tableName);
+                        Pair<Integer, String> res = service.deleteTrackDayExerciseSet(serverId);
+                        if (res.first == 200) {
+                            db.deleteSyncEntry(element.local_id, element.tableName);
+                            db.deleteHistory(element.id);
+                        }
+                    }
+                }
+            }
+
+            // TODO Handle exercise changes
+
+        } catch (OperationCanceledException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (AuthenticatorException e) {
+            e.printStackTrace();
+        }
     }
 }

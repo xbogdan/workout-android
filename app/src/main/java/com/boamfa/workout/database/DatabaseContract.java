@@ -44,7 +44,6 @@ public final class DatabaseContract {
 
     public static abstract class TrackDayExerciseEntry implements BaseColumns {
         public static final String TABLE_NAME = "track_day_exercises";
-        public static final String COLUMN_SERVER_ID = "server_id";
         public static final String COLUMN_TRACK_DAY_ID = "track_day_id";
         public static final String COLUMN_EXERCISE_ID = "exercise_id";
         public static final String COLUMN_ORD = "ord";
@@ -120,24 +119,52 @@ public final class DatabaseContract {
     /**
      * History table
      */
-
     public static abstract class HistoryEntry implements BaseColumns {
         public static final String TABLE_NAME = "history";
         public static final String COLUMN_TABLE_NAME = "table_name";
+        public static final String COLUMN_LOCAL_ID = "local_id";
         public static final String COLUMN_CONTENT = "content";
         public static final String COLUMN_OPERATION = "operation";
         public static final String COLUMN_TIMESTAMP = "timestamp";
 
         public static final String SQL_CREATE_ENTRIES =
-                "CREATE TABLE " + HistoryEntry.TABLE_NAME + " (" +
-                    HistoryEntry._ID + " INTEGER PRIMARY KEY, " +
-                    HistoryEntry.COLUMN_TABLE_NAME + " TEXT, " +
-                    HistoryEntry.COLUMN_CONTENT + " TEXT, " +
-                    HistoryEntry.COLUMN_OPERATION + " TEXT, " +
-                    HistoryEntry.COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP " +
-                ");" ;
+            "CREATE TABLE " + HistoryEntry.TABLE_NAME + " (" +
+                HistoryEntry._ID + " INTEGER PRIMARY KEY, " +
+                HistoryEntry.COLUMN_TABLE_NAME + " TEXT, " +
+                HistoryEntry.COLUMN_LOCAL_ID + " INTEGER, " +
+                HistoryEntry.COLUMN_CONTENT + " BLOB, " +
+                HistoryEntry.COLUMN_OPERATION + " TEXT, " +
+                HistoryEntry.COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                "UNIQUE (" + HistoryEntry.COLUMN_LOCAL_ID + ", " + HistoryEntry.COLUMN_TABLE_NAME + ", " + HistoryEntry.COLUMN_OPERATION + ")" +
+            ");" ; // TODO create index
 
         public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + HistoryEntry.TABLE_NAME;
+    }
+
+
+    /**
+     * SyncTable
+     */
+    public static abstract class SyncEntry implements BaseColumns {
+        public static final String TABLE_NAME = "sync";
+        public static final String COLUMN_TABLE_NAME = "table_name";
+        public static final String COLUMN_SERVER_ID = "server_id";
+        public static final String COLUMN_LOCAL_ID = "local_id";
+        public static final String COLUMN_TIMESTAMP = "timestamp";
+
+        public static final String SQL_CREATE_ENTRIES =
+            "CREATE TABLE " + SyncEntry.TABLE_NAME + " (" +
+                SyncEntry._ID + " INTEGER PRIMARY KEY, " +
+                SyncEntry.COLUMN_SERVER_ID + " INTEGER DEFAULT NULL, " +
+                SyncEntry.COLUMN_LOCAL_ID + " INTEGER NOT NULL, " +
+                SyncEntry.COLUMN_TABLE_NAME + " TEXT, " +
+                SyncEntry.COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                "UNIQUE (" + SyncEntry.COLUMN_LOCAL_ID + ", " + SyncEntry.COLUMN_TABLE_NAME + ")" +
+            ");" +
+            "CREATE INDEX local_id_index ON " + SyncEntry.TABLE_NAME + " (" + SyncEntry.COLUMN_LOCAL_ID + ", " + SyncEntry.COLUMN_TABLE_NAME + ")";
+
+        public static final String SQL_DELETE_ENTRIES =
+            "DROP TABLE IF EXISTS " + SyncEntry.TABLE_NAME;
     }
 }

@@ -37,7 +37,7 @@ public class TrackActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final long trackId = getIntent().getIntExtra("track_id", -1);
+        final long trackId = getIntent().getLongExtra("track_id", -1);
 
         final ArrayList<TrackDay> trackDays = db.getTrackDays(trackId);
 

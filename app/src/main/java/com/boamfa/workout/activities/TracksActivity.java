@@ -60,6 +60,7 @@ public class TracksActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String m_Text = input.getText().toString();
+                        m_Text = m_Text.trim().replaceAll("\t", "").replaceAll("\n", "");
                         Track newTrack = new Track(m_Text);
                         newTrack.id = db.addTrack(newTrack);
 
@@ -88,7 +89,7 @@ public class TracksActivity extends BaseActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent i = new Intent(TracksActivity.this, TrackActivity.class);
-                    i.putExtra("track_id", position);
+                    i.putExtra("track_id", trackList.get(position).id);
                     startActivity(i);
                 }
             });

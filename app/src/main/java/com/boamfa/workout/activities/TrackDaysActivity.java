@@ -39,8 +39,8 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
 
     // Exercise popup window
     private static boolean gotExercises = false;
-    private static List<Exercise> exerciseList;
-    private static ExercisesAdapter exercisesAdapter;
+    public static List<Exercise> exerciseList;
+    public static ExercisesAdapter exercisesAdapter;
     private static ListView exercisesListView;
 
     private static PopupWindow exercisesPopup;
@@ -94,7 +94,7 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
          */
         if (!gotExercises) {
             exerciseList = db.getExercises();
-            gotExercises = true;
+//            gotExercises = true;
 
             // Exercise popup window
             exercisesPopup = new PopupWindow(drawerLayout, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, true);

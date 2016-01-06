@@ -136,6 +136,21 @@ public class AppService {
         return response;
     }
 
+    public Pair<Integer, String> updateTrackDay(HashMap<String, String> postParams) {
+        HashMap<String, String> requestHeaders = new HashMap<String, String>();
+        requestHeaders.put("withCredentials", "true");
+        requestHeaders.put("Authorization", authToken);
+
+        Pair<Integer, String> response = null;
+        try {
+            response = httpConn.sendRequest(endPoint + "/updateTrackDay", "PUT", postParams, requestHeaders);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
     public Pair<Integer, String> deleteTrackDay(long dayId) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
@@ -166,7 +181,7 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> createTrackDayExercise(int dayId, int exerciseId) {
+    public Pair<Integer, String> createTrackDayExercise(long dayId, long exerciseId) {
         HashMap<String, String> postParams = new HashMap<String, String>();
         postParams.put("day_id", dayId + "");
         postParams.put("exercise_id", exerciseId + "");
@@ -185,7 +200,7 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> deleteTrackDayExercise(int trackDayExerciseId) {
+    public Pair<Integer, String> deleteTrackDayExercise(long trackDayExerciseId) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
         requestHeaders.put("Authorization", authToken);
@@ -230,7 +245,7 @@ public class AppService {
         return response;
     }
 
-    public Pair<Integer, String> deleteTrackDayExerciseSet(int id) {
+    public Pair<Integer, String> deleteTrackDayExerciseSet(long id) {
         HashMap<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put("withCredentials", "true");
         requestHeaders.put("Authorization", authToken);

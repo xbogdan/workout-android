@@ -69,7 +69,6 @@ public class MainActivity extends BaseActivity {
                     Intent i = new Intent(MainActivity.this, TracksActivity.class);
                     startActivity(i);
                 }
-
             }).execute();
         }
     }

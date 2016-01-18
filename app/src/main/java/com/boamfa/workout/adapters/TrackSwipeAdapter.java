@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.activities.BaseActivity;
-import com.boamfa.workout.classes.AppTask;
 import com.boamfa.workout.classes.TrackDay;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
@@ -20,7 +19,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 

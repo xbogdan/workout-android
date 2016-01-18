@@ -16,17 +16,7 @@ import android.widget.ListView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.TracksSwipeAdapter;
-import com.boamfa.workout.classes.AppTask;
 import com.boamfa.workout.classes.Track;
-import com.boamfa.workout.classes.TrackDay;
-import com.boamfa.workout.classes.TrackDayExercise;
-import com.boamfa.workout.classes.TrackDayExerciseSet;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 public class TracksActivity extends BaseActivity {
 

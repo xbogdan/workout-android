@@ -66,6 +66,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
             authToken = future.getResult().getString("authtoken");
             service = new AppService(authToken);
 
+            // TODO Get server history changes
 
             /**
              * Syncing exercises

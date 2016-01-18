@@ -15,12 +15,7 @@ import android.widget.ListView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.TrackSwipeAdapter;
-import com.boamfa.workout.classes.AppTask;
-import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.classes.TrackDay;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

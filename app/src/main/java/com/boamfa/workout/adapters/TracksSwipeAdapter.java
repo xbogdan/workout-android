@@ -11,12 +11,10 @@ import android.widget.TextView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.activities.BaseActivity;
-import com.boamfa.workout.classes.AppTask;
 import com.boamfa.workout.classes.Track;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**

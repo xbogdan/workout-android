@@ -338,12 +338,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, Void, Pair<Integer, String>> {
 
         private final String mEmail;
         private final String mPassword;
         private final Activity mActivity;
-        private Pair<Integer, String> response;
         private Intent res;
 
         UserLoginTask(String email, String password, Activity activity) {
@@ -353,46 +352,40 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected Pair<Integer, String> doInBackground(Void... params) {
             AppService service = new AppService();
-            response = service.login(this.mEmail, this.mPassword);
-
-            return true;
+            return service.login(this.mEmail, this.mPassword);
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(Pair<Integer, String> response) {
             mAuthTask = null;
             showProgress(false);
-            if (success) {
-                if (response.first != 401) {
-                    JSONObject jsonResponse = null;
-                    Bundle data = new Bundle();
-                    try {
-                        jsonResponse = new JSONObject(response.second);
+            if (response.first != 401) {
+                JSONObject jsonResponse = null;
+                Bundle data = new Bundle();
+                try {
+                    jsonResponse = new JSONObject(response.second);
 
-                        String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
+                    String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 
-                        data.putString(AccountManager.KEY_ACCOUNT_NAME, this.mEmail);
-                        data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
-                        data.putString(AccountManager.KEY_AUTHTOKEN, jsonResponse.getString("auth_token"));
-                        data.putString(PARAM_USER_PASS, this.mPassword);
+                    data.putString(AccountManager.KEY_ACCOUNT_NAME, this.mEmail);
+                    data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
+                    data.putString(AccountManager.KEY_AUTHTOKEN, jsonResponse.getString("auth_token"));
+                    data.putString(PARAM_USER_PASS, this.mPassword);
 
-                        res = new Intent();
-                        res.putExtras(data);
+                    res = new Intent();
+                    res.putExtras(data);
 
-                        Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(i);
-                        finishLogin(this.res);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    mPasswordView.setError(getString(R.string.error_incorrect_password));
-                    mPasswordView.requestFocus();
+                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(i);
+                    finishLogin(this.res);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             } else {
-                // TODO show pop up error message
+                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                mPasswordView.requestFocus();
             }
         }
 

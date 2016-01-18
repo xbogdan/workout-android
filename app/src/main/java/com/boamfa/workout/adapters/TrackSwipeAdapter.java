@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.boamfa.workout.R;
 import com.boamfa.workout.activities.BaseActivity;
 import com.boamfa.workout.classes.TrackDay;
+import com.boamfa.workout.utils.Utils;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 
@@ -29,11 +30,9 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
     private BaseActivity context;
     private List<TrackDay> objects;
     private int resource;
-    private long trackId;
     private int textViewResourceId;
 
-    public TrackSwipeAdapter(Context context, int resource, int textViewResourceId, long trackId, List<TrackDay> objects) {
-        this.trackId = trackId;
+    public TrackSwipeAdapter(Context context, int resource, int textViewResourceId, List<TrackDay> objects) {
         this.context = (BaseActivity) context;
         this.objects = objects;
         this.resource = resource;
@@ -101,15 +100,16 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
         TextView textView = (TextView) convertView.findViewById(R.id.surface_text_view);
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
         Date date = null;
+        String newDate;
         try {
             date = format.parse(objects.get(position).date);
+            DateFormat format2 = new SimpleDateFormat("dd MMMM, yyyy", Locale.US);
+            newDate = format2.format(date);
         } catch (ParseException e) {
             e.printStackTrace();
-            // TODO Handle exception
+            newDate = objects.get(position).date;
         }
 
-        DateFormat format2 = new SimpleDateFormat("dd MMMM, yyyy", Locale.US);
-        String newDate = format2.format(date);
         textView.setText(newDate);
     }
 

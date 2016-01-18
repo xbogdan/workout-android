@@ -1,6 +1,5 @@
 package com.boamfa.workout.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,7 +21,6 @@ public class TracksActivity extends BaseActivity {
 
     private ListView tracksListView;
     private TracksSwipeAdapter tracksListAdapter;
-    private final Activity self = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +35,11 @@ public class TracksActivity extends BaseActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(self);
+                AlertDialog.Builder builder = new AlertDialog.Builder(TracksActivity.this);
                 builder.setTitle("Track name");
 
                 // Set up the input
-                final EditText input = new EditText(self);
+                final EditText input = new EditText(TracksActivity.this);
                 input.setTextColor(getResources().getColor(R.color.black));
                 builder.setView(input);
 

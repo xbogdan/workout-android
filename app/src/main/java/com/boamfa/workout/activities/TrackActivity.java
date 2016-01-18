@@ -43,7 +43,7 @@ public class TrackActivity extends BaseActivity {
 
         trackDayList = (ListView) findViewById(R.id.trackDayList);
 
-        trackDaysListAdapter = new TrackSwipeAdapter(this, R.layout.tracks_item, R.id.swipe, trackId, trackDays);
+        trackDaysListAdapter = new TrackSwipeAdapter(this, R.layout.tracks_item, R.id.swipe, trackDays);
         trackDayList.setAdapter(trackDaysListAdapter);
         trackDayList.setClickable(true);
         trackDayList.setOnItemClickListener(new ListView.OnItemClickListener() {

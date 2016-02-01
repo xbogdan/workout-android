@@ -19,8 +19,4 @@ public class History {
         this.operation = operation;
         this.timestamp = timestamp;
     }
-
-    public void delete() {
-        // TODO do this here
-    }
 }

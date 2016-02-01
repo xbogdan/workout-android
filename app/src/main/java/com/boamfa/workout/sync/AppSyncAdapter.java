@@ -13,8 +13,6 @@ import android.os.Bundle;
 import android.util.Pair;
 
 import com.boamfa.workout.R;
-import com.boamfa.workout.activities.MainActivity;
-import com.boamfa.workout.activities.TrackDaysActivity;
 import com.boamfa.workout.classes.History;
 import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.classes.TrackDay;
@@ -65,24 +63,54 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             authToken = future.getResult().getString("authtoken");
             service = new AppService(authToken);
+            Pair<Integer, String> response;
 
             // TODO Get server history changes
 
             /**
-             * Syncing exercises
+             * Syncing muscle groups
              */
-            Pair<Integer, String> response = service.getExercises();
+            response = service.getMuscleGroups();
             if (response.first == 200) {
                 try {
                     JSONObject jsonResponse = new JSONObject(response.second);
-                    JSONArray exercises = jsonResponse.getJSONArray("exercises");
+                    JSONArray items = jsonResponse.getJSONArray("muscle_groups");
 
-                    for (int i = 0, exNr = exercises.length(); i < exNr; i++) {
-                        JSONObject ex = exercises.getJSONObject(i);
+                    for (int i = 0, exNr = items.length(); i < exNr; i++) {
+                        JSONObject ex = items.getJSONObject(i);
+                        Long serverId = ex.getLong("id");
+                        Long muscleGroupId;
+                        try {
+                            muscleGroupId = ex.getLong("muscle_group_id");
+                        } catch (JSONException e) {
+                            muscleGroupId = null;
+                        }
+                        if (!db.checkSync(serverId, DatabaseContract.MuscleGroupEntry.TABLE_NAME)) {
+                            long id = db.addMuscleGroup(ex.getString("name"), muscleGroupId);
+                            db.setSyncId(id, DatabaseContract.MuscleGroupEntry.TABLE_NAME, serverId);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+            /**
+             * Syncing exercises
+             */
+            response = service.getExercises();
+            if (response.first == 200) {
+                try {
+                    JSONObject jsonResponse = new JSONObject(response.second);
+                    JSONArray items = jsonResponse.getJSONArray("exercises");
+
+                    for (int i = 0, exNr = items.length(); i < exNr; i++) {
+                        JSONObject ex = items.getJSONObject(i);
                         long serverId = ex.getInt("id");
 
-                        if (!db.checkExerciseSync(serverId)) {
-                            long id = db.addExercise(ex.getString("name"), ex.getInt("muscle_group_id"));
+                        if (!db.checkSync(serverId, DatabaseContract.ExerciseEntry.TABLE_NAME)) {
+                            long id = db.addExercise(ex.getString("name"));
                             db.setSyncId(id, DatabaseContract.ExerciseEntry.TABLE_NAME, serverId);
                         }
                     }
@@ -90,6 +118,33 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                     e.printStackTrace();
                 }
             }
+
+
+            /**
+             * Syncing exercise muscle groups
+             */
+            response = service.getExerciseMuscleGroups();
+            if (response.first == 200) {
+                try {
+                    JSONObject jsonResponse = new JSONObject(response.second);
+                    JSONArray items = jsonResponse.getJSONArray("exercise_muscle_groups");
+
+                    for (int i = 0, exNr = items.length(); i < exNr; i++) {
+                        JSONObject ex = items.getJSONObject(i);
+                        long serverId = ex.getInt("id");
+
+                        if (!db.checkSync(serverId, DatabaseContract.ExerciseMuscleGroupEntry.TABLE_NAME)) {
+                            long local_exercise_id = db.getSyncLocalId(ex.getLong("exercise_id"), DatabaseContract.ExerciseEntry.TABLE_NAME);
+                            long local_muscle_group_id = db.getSyncLocalId(ex.getLong("muscle_group_id"), DatabaseContract.MuscleGroupEntry.TABLE_NAME);
+                            long id = db.addExerciseMuscleGroup(local_exercise_id, local_muscle_group_id, ex.getBoolean("primary"));
+                            db.setSyncId(id, DatabaseContract.ExerciseMuscleGroupEntry.TABLE_NAME, serverId);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
 
             ArrayList<History> list = db.getAllHistory();
             for (int i = 0, len = list.size(); i < len; i++) {
@@ -129,7 +184,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
 
                         // UPDATE
                         if (element.operation.equals("update")) {
-                            long serverId = db.getSyncId(element.local_id, element.tableName);
+                            long serverId = db.getSyncServerId(element.local_id, element.tableName);
 
                             HashMap<String, String> postParams = new HashMap<String, String>();
                             postParams.put("track[id]", serverId+"");
@@ -144,7 +199,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     // DELETE
                     if (element.operation.equals("delete")) {
-                        long serverId = db.getSyncId(element.local_id, DatabaseContract.TrackEntry.TABLE_NAME);
+                        long serverId = db.getSyncServerId(element.local_id, DatabaseContract.TrackEntry.TABLE_NAME);
                         Pair<Integer, String> res = service.deleteTrack(serverId);
                         if (res.first == 200) {
                             db.deleteSyncEntry(element.local_id, element.tableName);
@@ -172,7 +227,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
 
                         // INSERT
                         if (element.operation.equals("insert")) {
-                            long trackServerId = db.getSyncId(obj.trackId, DatabaseContract.TrackEntry.TABLE_NAME);
+                            long trackServerId = db.getSyncServerId(obj.trackId, DatabaseContract.TrackEntry.TABLE_NAME);
                             Pair<Integer, String> res = service.createTrackDay(trackServerId, obj.date);
                             if (res.first == 201) {
                                 try {
@@ -188,7 +243,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
 
                         // UPDATE
                         if (element.operation.equals("update")) {
-                            long serverId = db.getSyncId(element.local_id, element.tableName);
+                            long serverId = db.getSyncServerId(element.local_id, element.tableName);
 
                             HashMap<String, String> postParams = new HashMap<String, String>();
                             postParams.put("id", serverId+"");
@@ -203,7 +258,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     // DELETE
                     if (element.operation.equals("delete")) {
-                        long serverId = db.getSyncId(element.local_id, element.tableName);
+                        long serverId = db.getSyncServerId(element.local_id, element.tableName);
                         Pair<Integer, String> res = service.deleteTrackDay(serverId);
                         if (res.first == 200) {
                             db.deleteSyncEntry(element.local_id, element.tableName);
@@ -231,8 +286,8 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
 
                         // INSERT
                         if (element.operation.equals("insert")) {
-                            long serverExerciseId = db.getSyncId(obj.exerciseId, DatabaseContract.ExerciseEntry.TABLE_NAME);
-                            long serverTrackDayId = db.getSyncId(obj.trackDayId, DatabaseContract.TrackDayEntry.TABLE_NAME);
+                            long serverExerciseId = db.getSyncServerId(obj.exerciseId, DatabaseContract.ExerciseEntry.TABLE_NAME);
+                            long serverTrackDayId = db.getSyncServerId(obj.trackDayId, DatabaseContract.TrackDayEntry.TABLE_NAME);
                             Pair<Integer, String> res = service.createTrackDayExercise(serverTrackDayId, serverExerciseId);
                             if (res.first == 201) {
                                 try {
@@ -248,8 +303,8 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
 
                         // UPDATE
                         if (element.operation.equals("update")) {
-                            long serverId = db.getSyncId(element.local_id, element.tableName);
-                            long serverExerciseId = db.getSyncId(obj.exerciseId, DatabaseContract.ExerciseEntry.TABLE_NAME);
+                            long serverId = db.getSyncServerId(element.local_id, element.tableName);
+                            long serverExerciseId = db.getSyncServerId(obj.exerciseId, DatabaseContract.ExerciseEntry.TABLE_NAME);
 
                             HashMap<String, String> postParams = new HashMap<String, String>();
                             postParams.put("id", serverId+"");
@@ -264,7 +319,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     // DELETE
                     if (element.operation.equals("delete")) {
-                        long serverId = db.getSyncId(element.local_id, element.tableName);
+                        long serverId = db.getSyncServerId(element.local_id, element.tableName);
                         Pair<Integer, String> res = service.deleteTrackDayExercise(serverId);
                         if (res.first == 200) {
                             db.deleteSyncEntry(element.local_id, element.tableName);
@@ -292,7 +347,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
 
                         // INSERT
                         if (element.operation.equals("insert")) {
-                            long serverTrackDayExerciseId = db.getSyncId(obj.trackDayExerciseId, DatabaseContract.TrackDayExerciseEntry.TABLE_NAME);
+                            long serverTrackDayExerciseId = db.getSyncServerId(obj.trackDayExerciseId, DatabaseContract.TrackDayExerciseEntry.TABLE_NAME);
 
                             HashMap<String, String> postParams = new HashMap<String, String>();
                             postParams.put("track_day_exercise_id", serverTrackDayExerciseId+"");
@@ -314,7 +369,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
 
                         // UPDATE
                         if (element.operation.equals("update")) {
-                            long serverId = db.getSyncId(element.local_id, element.tableName);
+                            long serverId = db.getSyncServerId(element.local_id, element.tableName);
 
                             HashMap<String, String> postParams = new HashMap<String, String>();
                             postParams.put("id", serverId+"");
@@ -330,7 +385,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     // DELETE
                     if (element.operation.equals("delete")) {
-                        long serverId = db.getSyncId(element.local_id, element.tableName);
+                        long serverId = db.getSyncServerId(element.local_id, element.tableName);
                         Pair<Integer, String> res = service.deleteTrackDayExerciseSet(serverId);
                         if (res.first == 200) {
                             db.deleteSyncEntry(element.local_id, element.tableName);

@@ -43,6 +43,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(TrackDayExerciseSetEntry.SQL_CREATE_ENTRIES);
         db.execSQL(ExerciseEntry.SQL_CREATE_ENTRIES);
         db.execSQL(MuscleGroupEntry.SQL_CREATE_ENTRIES);
+        db.execSQL(ExerciseMuscleGroupEntry.SQL_CREATE_ENTRIES);
         db.execSQL(HistoryEntry.SQL_CREATE_ENTRIES);
         db.execSQL(SyncEntry.SQL_CREATE_ENTRIES);
     }
@@ -55,6 +56,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(TrackDayExerciseEntry.SQL_DELETE_ENTRIES);
         db.execSQL(TrackDayExerciseSetEntry.SQL_DELETE_ENTRIES);
         db.execSQL(ExerciseEntry.SQL_DELETE_ENTRIES);
+        db.execSQL(ExerciseMuscleGroupEntry.SQL_DELETE_ENTRIES);
         db.execSQL(MuscleGroupEntry.SQL_DELETE_ENTRIES);
         db.execSQL(HistoryEntry.SQL_DELETE_ENTRIES);
         db.execSQL(SyncEntry.SQL_DELETE_ENTRIES);
@@ -70,6 +72,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(TrackDayExerciseEntry.SQL_DELETE_ENTRIES);
         db.execSQL(TrackDayExerciseSetEntry.SQL_DELETE_ENTRIES);
         db.execSQL(ExerciseEntry.SQL_DELETE_ENTRIES);
+        db.execSQL(ExerciseMuscleGroupEntry.SQL_DELETE_ENTRIES);
         db.execSQL(MuscleGroupEntry.SQL_DELETE_ENTRIES);
         db.execSQL(HistoryEntry.SQL_DELETE_ENTRIES);
         db.execSQL(SyncEntry.SQL_DELETE_ENTRIES);
@@ -340,11 +343,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Exercises
      */
-    public long addExercise(String name, int muscleGroupId) {
+    public long addExercise(String name) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(ExerciseEntry.COLUMN_NAME, name);
-        values.put(ExerciseEntry.COLUMN_MUSCLE_GROUP_ID, muscleGroupId);
 
         // Inserting Row
         long id = db.insert(ExerciseEntry.TABLE_NAME, null, values);
@@ -370,6 +372,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         return list;
+    }
+
+
+    /**
+     * Muscle Groups
+     */
+    public long addMuscleGroup(String name, Long muscleGroupId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(MuscleGroupEntry.COLUMN_NAME, name);
+        values.put(MuscleGroupEntry.COLUMN_MUSCLE_GROUP_ID, muscleGroupId);
+
+        // Inserting Row
+        long id = db.insert(MuscleGroupEntry.TABLE_NAME, null, values);
+        addSyncId(id, MuscleGroupEntry.TABLE_NAME);
+        db.close();
+
+        return id;
+    }
+
+
+    /**
+     * Exercise Muscle Groups
+     */
+    public long addExerciseMuscleGroup(long exerciseId, long muscleGroupId, boolean primary) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(ExerciseMuscleGroupEntry.COLUMN_EXERCISE_ID, exerciseId);
+        values.put(ExerciseMuscleGroupEntry.COLUMN_MUSCLE_GROUP_ID, muscleGroupId);
+        values.put(ExerciseMuscleGroupEntry.COLUMN_PRIMARY, primary);
+
+        // Inserting Row
+        long id = db.insert(ExerciseMuscleGroupEntry.TABLE_NAME, null, values);
+        addSyncId(id, ExerciseMuscleGroupEntry.TABLE_NAME);
+        db.close();
+
+        return id;
     }
 
 
@@ -434,13 +473,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return null;
     }
 
-    public Long getSyncId(long localId, String tableName) {
+    public Long getSyncServerId(long localId, String tableName) {
         SQLiteDatabase db = this.getWritableDatabase();
         String selectQuery =
                 "SELECT server_id FROM " + SyncEntry.TABLE_NAME +
-                " WHERE " +
-                    SyncEntry.COLUMN_LOCAL_ID + " = " + localId + " AND " +
-                    SyncEntry.COLUMN_TABLE_NAME + " = '" + tableName + "'";
+                        " WHERE " +
+                        SyncEntry.COLUMN_LOCAL_ID + " = " + localId + " AND " +
+                        SyncEntry.COLUMN_TABLE_NAME + " = '" + tableName + "'";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            return cursor.getLong(0);
+        }
+        return new Long(0);
+    }
+
+    public Long getSyncLocalId(long serverId, String tableName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selectQuery =
+                "SELECT server_id FROM " + SyncEntry.TABLE_NAME +
+                        " WHERE " +
+                        SyncEntry.COLUMN_SERVER_ID + " = " + serverId + " AND " +
+                        SyncEntry.COLUMN_TABLE_NAME + " = '" + tableName + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -457,6 +512,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         " WHERE " +
                         SyncEntry.COLUMN_SERVER_ID + " = " + serverId + " AND " +
                         SyncEntry.COLUMN_TABLE_NAME + " = '" + ExerciseEntry.TABLE_NAME + "'";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            return true;
+        }
+        return false;
+    }
+
+    public Boolean checkSync(long serverId, String tableName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selectQuery =
+            "SELECT server_id FROM " + SyncEntry.TABLE_NAME +
+                " WHERE " +
+                SyncEntry.COLUMN_SERVER_ID + " = " + serverId + " AND " +
+                SyncEntry.COLUMN_TABLE_NAME + " = '" + tableName + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 

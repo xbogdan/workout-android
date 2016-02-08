@@ -165,6 +165,25 @@ public final class DatabaseContract {
 
 
     /**
+     * Favorite user exercise
+     */
+    public static abstract class FavoriteUserExercise implements BaseColumns {
+        public static final String TABLE_NAME = "favorite_user_exercises";
+        public static final String COLUMN_EXERCISE_ID = "exercise_id";
+
+        public static final String SQL_CREATE_ENTRIES =
+            "CREATE TABLE " + TABLE_NAME + " (" +
+                _ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_EXERCISE_ID + " INTEGER, " +
+                "FOREIGN KEY (" + COLUMN_EXERCISE_ID + ") REFERENCES " + ExerciseEntry.TABLE_NAME + "(" + ExerciseEntry._ID + ")" +
+            ");" ;
+
+        public static final String SQL_DELETE_ENTRIES =
+            "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
+
+
+    /**
      * History table
      */
     public static abstract class HistoryEntry implements BaseColumns {

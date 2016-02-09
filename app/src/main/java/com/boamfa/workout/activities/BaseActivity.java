@@ -48,6 +48,8 @@ public class BaseActivity extends AppCompatActivity {
 
     public static DatabaseHandler db;
 
+    public Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +62,7 @@ public class BaseActivity extends AppCompatActivity {
         accountManager = AccountManager.get(this);
         db = new DatabaseHandler(this);
 
-        Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
+        toolbar = (Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);

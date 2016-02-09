@@ -167,7 +167,7 @@ public final class DatabaseContract {
     /**
      * Favorite user exercise
      */
-    public static abstract class FavoriteUserExercise implements BaseColumns {
+    public static abstract class FavoriteUserExerciseEntry implements BaseColumns {
         public static final String TABLE_NAME = "favorite_user_exercises";
         public static final String COLUMN_EXERCISE_ID = "exercise_id";
 
@@ -201,8 +201,8 @@ public final class DatabaseContract {
                 HistoryEntry.COLUMN_LOCAL_ID + " INTEGER, " +
                 HistoryEntry.COLUMN_CONTENT + " BLOB, " +
                 HistoryEntry.COLUMN_OPERATION + " TEXT, " +
-                HistoryEntry.COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
-                "UNIQUE (" + HistoryEntry.COLUMN_LOCAL_ID + ", " + HistoryEntry.COLUMN_TABLE_NAME + ", " + HistoryEntry.COLUMN_OPERATION + ")" +
+                HistoryEntry.COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP" + // TODO add index
+//                "UNIQUE (" + HistoryEntry.COLUMN_LOCAL_ID + ", " + HistoryEntry.COLUMN_TABLE_NAME + ", " + HistoryEntry.COLUMN_OPERATION + ")" +
             ");";
 
         public static final String SQL_DELETE_ENTRIES =

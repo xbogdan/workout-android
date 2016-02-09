@@ -4,32 +4,41 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.classes.Exercise;
+import com.boamfa.workout.database.DatabaseHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by bogdan on 13/12/15.
+ * Exercises adapter
  */
 public class ExercisesAdapter extends BaseAdapter implements Filterable {
     private List<Exercise> mObjects;
     private List<Exercise> mOriginalValues;
     private Context mContext;
-    private PopupWindow popupWindow;
+    private boolean removeAction;
 
-    public ExercisesAdapter(Context context, List<Exercise> objects, PopupWindow popupWindow) {
+    OnAdapterInteractionListener mListener;
+
+    public interface OnAdapterInteractionListener {
+        void setFavorite(Exercise exercise);
+        void removeFavorite(Exercise exercise);
+    }
+
+    public ExercisesAdapter(Context context, List<Exercise> objects, boolean removeAction, OnAdapterInteractionListener listener) {
         this.mObjects = objects;
         this.mContext = context;
-        this.popupWindow = popupWindow;
+        this.removeAction = removeAction;
+        this.mListener = listener;
     }
 
     @Override
@@ -51,16 +60,45 @@ public class ExercisesAdapter extends BaseAdapter implements Filterable {
         return position;
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(mContext)
-                    .inflate(R.layout.exercise_item, parent, false);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.exercise_item, parent, false);
         }
 
-        Exercise exercise = getItem(position);
+        final Exercise exercise = getItem(position);
 
         TextView exerciseNameTextView = (TextView) convertView.findViewById(R.id.exercise_name);
         exerciseNameTextView.setText(exercise.name);
+
+        final Button save = (Button) convertView.findViewById(R.id.save);
+        if (exercise.favorite) {
+            save.setText("Remove");
+            save.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DatabaseHandler db = new DatabaseHandler(mContext);
+                    db.deleteFavoriteExercise(exercise.id);
+                    save.setText("Save");
+                    mObjects.get(position).favorite = false;
+                    if (removeAction) mObjects.remove(position);
+                    notifyDataSetChanged();
+                    mListener.removeFavorite(exercise);
+                }
+            });
+        } else {
+            save.setText("Save");
+            save.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DatabaseHandler db = new DatabaseHandler(mContext);
+                    db.addFavoriteExercise(exercise.id);
+                    save.setText("Remove");
+                    mObjects.get(position).favorite = true;
+                    notifyDataSetChanged();
+                    mListener.setFavorite(exercise);
+                }
+            });
+        }
 
         return convertView;
     }
@@ -77,7 +115,7 @@ public class ExercisesAdapter extends BaseAdapter implements Filterable {
                     mOriginalValues = new ArrayList<Exercise>(mObjects);
                 }
 
-                if(constraint == null || constraint.length() == 0) {
+                if (constraint == null || constraint.length() == 0) {
                     // set the Original result to return
                     if (mOriginalValues != null) {
                         filterResults.count = mOriginalValues.size();

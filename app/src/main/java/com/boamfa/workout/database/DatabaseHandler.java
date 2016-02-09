@@ -12,6 +12,7 @@ import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.classes.TrackDay;
 import com.boamfa.workout.classes.TrackDayExercise;
 import com.boamfa.workout.classes.TrackDayExerciseSet;
+import com.boamfa.workout.fragments.FavoriteExercisesFragment;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,6 +43,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(TrackDayExerciseEntry.SQL_CREATE_ENTRIES);
         db.execSQL(TrackDayExerciseSetEntry.SQL_CREATE_ENTRIES);
         db.execSQL(ExerciseEntry.SQL_CREATE_ENTRIES);
+        db.execSQL(FavoriteUserExerciseEntry.SQL_CREATE_ENTRIES);
         db.execSQL(MuscleGroupEntry.SQL_CREATE_ENTRIES);
         db.execSQL(ExerciseMuscleGroupEntry.SQL_CREATE_ENTRIES);
         db.execSQL(HistoryEntry.SQL_CREATE_ENTRIES);
@@ -56,6 +58,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(TrackDayExerciseEntry.SQL_DELETE_ENTRIES);
         db.execSQL(TrackDayExerciseSetEntry.SQL_DELETE_ENTRIES);
         db.execSQL(ExerciseEntry.SQL_DELETE_ENTRIES);
+        db.execSQL(FavoriteUserExerciseEntry.SQL_CREATE_ENTRIES);
         db.execSQL(ExerciseMuscleGroupEntry.SQL_DELETE_ENTRIES);
         db.execSQL(MuscleGroupEntry.SQL_DELETE_ENTRIES);
         db.execSQL(HistoryEntry.SQL_DELETE_ENTRIES);
@@ -72,6 +75,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(TrackDayExerciseEntry.SQL_DELETE_ENTRIES);
         db.execSQL(TrackDayExerciseSetEntry.SQL_DELETE_ENTRIES);
         db.execSQL(ExerciseEntry.SQL_DELETE_ENTRIES);
+        db.execSQL(FavoriteUserExerciseEntry.SQL_DELETE_ENTRIES);
         db.execSQL(ExerciseMuscleGroupEntry.SQL_DELETE_ENTRIES);
         db.execSQL(MuscleGroupEntry.SQL_DELETE_ENTRIES);
         db.execSQL(HistoryEntry.SQL_DELETE_ENTRIES);
@@ -293,6 +297,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 list.add(element);
             } while (cursor.moveToNext());
         }
+        db.close();
 
         return list;
     }
@@ -360,18 +365,68 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ArrayList<Exercise> list = new ArrayList<Exercise>();
 
-        String selectQuery = "SELECT _id, name FROM " + ExerciseEntry.TABLE_NAME;
+        String selectQuery = "SELECT e._id, e.name, fae.exercise_id FROM " + ExerciseEntry.TABLE_NAME + " AS e LEFT JOIN " + FavoriteUserExerciseEntry.TABLE_NAME + " AS fae ON(fae.exercise_id=e._id)";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
                 Exercise element = new Exercise(Integer.parseInt(cursor.getString(0)), cursor.getString(1));
+                Long ex_id = cursor.getLong(2);
+                if (ex_id != 0) {
+                    element.favorite = true;
+                } else {
+                    element.favorite = false;
+                }
                 list.add(element);
             } while (cursor.moveToNext());
         }
+        db.close();
 
         return list;
+    }
+
+
+    /**
+     * Favorite exercises
+     */
+    public ArrayList<Exercise> getFavoriteExercises() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ArrayList<Exercise> list = new ArrayList<Exercise>();
+
+        String selectQuery = "SELECT e._id, e.name FROM " + FavoriteUserExerciseEntry.TABLE_NAME + " AS fue , " + ExerciseEntry.TABLE_NAME + " AS e WHERE fue.exercise_id=e._id";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Exercise element = new Exercise(Integer.parseInt(cursor.getString(0)), cursor.getString(1));
+                element.favorite = true;
+                list.add(element);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+
+        return list;
+    }
+
+    public long addFavoriteExercise(long exerciseId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(FavoriteUserExerciseEntry.COLUMN_EXERCISE_ID, exerciseId);
+
+        // Inserting Row
+        long id = db.insert(FavoriteUserExerciseEntry.TABLE_NAME, null, values);
+        addSyncId(id, FavoriteUserExerciseEntry.TABLE_NAME);
+        db.close();
+
+        return id;
+    }
+
+    public void deleteFavoriteExercise(long id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(FavoriteUserExerciseEntry.TABLE_NAME, FavoriteUserExerciseEntry.COLUMN_EXERCISE_ID + " = ?", new String[]{id + ""});
+        db.close();
     }
 
 

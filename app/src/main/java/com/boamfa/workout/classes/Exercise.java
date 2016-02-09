@@ -8,6 +8,7 @@ public class Exercise {
     public long id;
     public long muscleGroupId;
     public String muscleGroupName;
+    public Boolean favorite=false;
 
     public Exercise(long id, String name) {
         this.id = id;

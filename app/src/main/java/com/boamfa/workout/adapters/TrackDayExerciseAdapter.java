@@ -64,6 +64,11 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         return childPosition;
     }
 
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
+
     public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View view, ViewGroup parent) {
         TrackDayExerciseSet child = (TrackDayExerciseSet) getChild(groupPosition, childPosition);
         if (view == null) {
@@ -98,6 +103,11 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         return view;
     }
 
+    @Override
+    public boolean isChildSelectable(int groupPosition, int childPosition) {
+        return false;
+    }
+
     public int getChildrenCount(int groupPosition) {
         return groups.get(groupPosition).sets.size();
     }
@@ -124,6 +134,10 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         final ImageView groupIndicator = (ImageView) view.findViewById(R.id.group_indicator);
         if (groupIndicator.getDrawable() == null) {
             groupIndicator.setImageDrawable(context.getResources().getDrawable(R.drawable.arrow_right));
+            if (groups.get(groupPosition).sets.size() == 0) {
+                groupIndicator.setImageAlpha(0); // TODO fix version compatibility
+            }
+        } else {
             if (groups.get(groupPosition).sets.size() == 0) {
                 groupIndicator.setImageAlpha(0); // TODO fix version compatibility
             }
@@ -161,16 +175,6 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         });
 
         return view;
-    }
-
-    public boolean hasStableIds() {
-        // TODO Auto-generated method stub
-        return true;
-    }
-
-    public boolean isChildSelectable(int arg0, int arg1) {
-        // TODO Auto-generated method stub
-        return true;
     }
 }
 

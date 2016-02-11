@@ -6,17 +6,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.ExercisesAdapter;
@@ -27,6 +21,7 @@ import com.boamfa.workout.classes.TrackDayExerciseSet;
 import com.boamfa.workout.fragments.AllExercisesFragment;
 import com.boamfa.workout.fragments.ExercisesFragment;
 import com.boamfa.workout.fragments.FavoriteExercisesFragment;
+import com.boamfa.workout.utils.SetPopupWindow;
 
 import java.util.ArrayList;
 
@@ -37,15 +32,14 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
     private long trackDayId;
     private ArrayList<TrackDayExercise> trackDayExercises;
 
+    private SetPopupWindow stw;
+
     private ExpandableListView trackDayExercisesListView;
     private TrackDayExerciseAdapter trackDayExercisesAdapter;
 
-    private static PopupWindow setPopup;
-
     private View contentView;
 
-    private Button setPopupOkButton;
-    FloatingActionButton floatingActionButton;
+    private FloatingActionButton floatingActionButton;
 
     private Integer editingGroup = null;
 
@@ -67,7 +61,6 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
         trackDayExercisesListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
             @Override
             public void onGroupCollapse(int groupPosition) {
-
             }
         });
         trackDayExercisesListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
@@ -98,7 +91,8 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
             }
         });
 
-        createSetPoupup();
+        // Create popup window
+        stw = new SetPopupWindow(this, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
     }
 
     private void showExercises() {
@@ -119,57 +113,14 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
         ft.commit();
     }
 
-    private void createSetPoupup() {
-        // Set popup window
-        setPopup = new PopupWindow(contentView, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, true);
-        setPopup.setFocusable(true);
-        setPopup.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
-        // Set popup window background
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final RelativeLayout setPopupBg = (RelativeLayout) inflater.inflate(R.layout.set_popup, null, false);
-        setPopupBg.getBackground().setAlpha(400); // Dim the background color
-        setPopup.setContentView(setPopupBg);
-
-        // Close popup button
-        Button closeButton = (Button) setPopupBg.findViewById(R.id.set_close);
-        closeButton.setOnClickListener(new View.OnClickListener(){
-    @Override
-    public void onClick(View v){
-        setPopup.dismiss();
-            }
-        });
-
-        // Close popup button
-        setPopupOkButton = (Button) setPopupBg.findViewById(R.id.set_ok);
-        closeButton.setOnClickListener(new View.OnClickListener(){
-    @Override
-    public void onClick(View v){
-        setPopup.dismiss();
-            }
-        });
-    }
-
     @Override
     public void showSetPopup() {
-        setPopup.showAtLocation(drawerLayout, Gravity.CENTER, 0, 0);
-    }
-
-    public double getWeight() {
-        EditText weightField = (EditText) setPopup.getContentView().findViewById(R.id.set_weight);
-        double value = Double.parseDouble(weightField.getText().toString());
-        return value;
-    }
-
-    public int getReps() {
-        EditText weightField = (EditText) setPopup.getContentView().findViewById(R.id.set_reps);
-        int value = Integer.parseInt(weightField.getText().toString());
-        return value;
+        stw.showCenter(drawerLayout);
     }
 
     @Override
     public void closeSetPopup() {
-        setPopup.dismiss();
+        stw.dismiss();
     }
 
     @Override
@@ -188,19 +139,13 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
 
     @Override
     public void addChild(final int groupPosition, final ImageView groupIndicator) {
-        showSetPopup();
-        setPopupOkButton.setOnClickListener(new View.OnClickListener() {
+        stw.showCenter(drawerLayout);
+        stw.okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                closeSetPopup();
+                stw.dismiss();
 
-                EditText weightField = (EditText) setPopup.getContentView().findViewById(R.id.set_weight);
-                double weight = Double.parseDouble(weightField.getText().toString());
-
-                EditText repsField = (EditText) setPopup.getContentView().findViewById(R.id.set_reps);
-                int reps = Integer.parseInt(repsField.getText().toString());
-
-                TrackDayExerciseSet trackDayExerciseSet = new TrackDayExerciseSet(reps, weight, trackDayExercises.get(groupPosition).id);
+                TrackDayExerciseSet trackDayExerciseSet = new TrackDayExerciseSet(stw.getReps(), stw.getWeight(), trackDayExercises.get(groupPosition).id);
                 trackDayExerciseSet.id = db.addTrackDayExerciseSet(trackDayExerciseSet);
                 trackDayExercises.get(groupPosition).sets.add(trackDayExerciseSet);
                 trackDayExercisesAdapter.notifyDataSetChanged();
@@ -218,24 +163,19 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
 
     @Override
     public void editChild(final int groupPosition, final int childPosition) {
-        showSetPopup();
+        stw.showCenter(drawerLayout);
         final TrackDayExerciseSet trackDayExerciseSet = trackDayExercises.get(groupPosition).sets.get(childPosition);
-        final EditText weightField = (EditText) setPopup.getContentView().findViewById(R.id.set_weight);
-        final EditText repsField = (EditText) setPopup.getContentView().findViewById(R.id.set_reps);
 
-        weightField.setText(trackDayExerciseSet.weight+"");
-        repsField.setText(trackDayExerciseSet.reps + "");
+        stw.setWeight(trackDayExerciseSet.weight);
+        stw.setReps(trackDayExerciseSet.reps);
 
-        setPopupOkButton.setOnClickListener(new View.OnClickListener() {
+        stw.okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                closeSetPopup();
+                stw.dismiss();
 
-                double weight = Double.parseDouble(weightField.getText().toString());
-                int reps = Integer.parseInt(repsField.getText().toString());
-
-                trackDayExerciseSet.reps = reps;
-                trackDayExerciseSet.weight = weight;
+                trackDayExerciseSet.reps = stw.getReps();
+                trackDayExerciseSet.weight = stw.getWeight();
                 db.updateTrackDayExerciseSet(trackDayExerciseSet);
                 trackDayExercisesAdapter.notifyDataSetChanged();
             }
@@ -254,29 +194,23 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
             hideExercises();
             floatingActionButton.show();
         } else {
-            showSetPopup();
+            stw.showCenter(drawerLayout);
             floatingActionButton.hide();
-            setPopupOkButton.setOnClickListener(new View.OnClickListener() {
+            stw.okButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // Add track day exercise
                     TrackDayExercise trackDayExercise = new TrackDayExercise(exercise.name, exercise.id, trackDayId);
                     trackDayExercise.id = db.addTrackDayExercise(trackDayExercise);
 
-                    final EditText weightField = (EditText) setPopup.getContentView().findViewById(R.id.set_weight);
-                    final EditText repsField = (EditText) setPopup.getContentView().findViewById(R.id.set_reps);
-
-                    double weight = Double.parseDouble(weightField.getText().toString());
-                    int reps = Integer.parseInt(repsField.getText().toString());
-
                     // Add track day exercise set
-                    TrackDayExerciseSet trackDayExerciseSet = new TrackDayExerciseSet(reps, weight, trackDayExercise.id);
-                    db.addTrackDayExerciseSet(trackDayExerciseSet);
+                    TrackDayExerciseSet trackDayExerciseSet = new TrackDayExerciseSet(stw.getReps(), stw.getWeight(), trackDayExercise.id);
                     trackDayExercise.sets.add(trackDayExerciseSet);
+                    db.addTrackDayExerciseSet(trackDayExerciseSet);
 
                     trackDayExercises.add(trackDayExercise);
                     trackDayExercisesAdapter.notifyDataSetChanged();
-                    closeSetPopup();
+                    stw.dismiss();
 
                     // Hide fragment
                     hideExercises();

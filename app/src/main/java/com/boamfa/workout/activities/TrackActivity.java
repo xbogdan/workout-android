@@ -24,7 +24,6 @@ import java.util.Calendar;
 
 public class TrackActivity extends BaseActivity {
 
-    private final Activity self = this;
     private ListView trackDayList;
     private TrackSwipeAdapter trackDaysListAdapter;
 
@@ -80,11 +79,11 @@ public class TrackActivity extends BaseActivity {
                 };
 
                 new DatePickerDialog(
-                        self,
-                        date,
-                        myCalendar.get(Calendar.YEAR),
-                        myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)
+                    TrackActivity.this,
+                    date,
+                    myCalendar.get(Calendar.YEAR),
+                    myCalendar.get(Calendar.MONTH),
+                    myCalendar.get(Calendar.DAY_OF_MONTH)
                 ).show();
             }
         });

@@ -23,12 +23,6 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
 //        db.reinstall();
-//        db.addExercise("Dumbell curl");
-//        db.addExercise("Barbell curl");
-//        db.addExercise("Incline press");
-//        db.addExercise("Pullups");
-//        db.addExercise("Chinups");
-//        db.addExercise("Dumbell rows");
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View contentView = inflater.inflate(R.layout.activity_main, null, false);

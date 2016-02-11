@@ -30,9 +30,6 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         void addChild(int groupPosition, ImageView groupIndicator);
         void deleteChild(int groupPosition, int childPosition);
         void editChild(int groupPosition, int childPosition);
-
-        void showSetPopup();
-        void closeSetPopup();
     }
 
     private ArrayList<TrackDayExercise> groups;

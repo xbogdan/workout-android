@@ -114,16 +114,6 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
     }
 
     @Override
-    public void showSetPopup() {
-        stw.showCenter(drawerLayout);
-    }
-
-    @Override
-    public void closeSetPopup() {
-        stw.dismiss();
-    }
-
-    @Override
     public void deleteGroup(int groupPosition) {
         db.deleteTrackDayExercise(trackDayExercises.get(groupPosition).id);
         trackDayExercises.remove(groupPosition);

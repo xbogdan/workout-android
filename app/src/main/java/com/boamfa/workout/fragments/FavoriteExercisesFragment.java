@@ -60,12 +60,12 @@ public class FavoriteExercisesFragment extends Fragment implements ExercisesAdap
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_all_exercises, container, false);
+        View view = inflater.inflate(R.layout.fragment_favorite_exercises, container, false);
 
         DatabaseHandler db = new DatabaseHandler(getActivity());
         exercisesList = db.getFavoriteExercises();
-        exercisesAdapter = new ExercisesAdapter(getActivity(), exercisesList, true, this);
-        ListView exercisesListView = (ListView) view.findViewById(R.id.exercises_list);
+        exercisesAdapter = new ExercisesAdapter(getContext(), exercisesList, true, this, getActivity());
+        ListView exercisesListView = (ListView) view.findViewById(R.id.favorite_exercises_list);
         exercisesListView.setAdapter(exercisesAdapter);
 
         EditText exerciseSearch = (EditText) view.findViewById(R.id.exercises_search);

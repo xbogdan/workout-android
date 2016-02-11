@@ -7,7 +7,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -64,14 +63,8 @@ public class AllExercisesFragment extends Fragment implements ExercisesAdapter.O
 
         DatabaseHandler db = new DatabaseHandler(getActivity());
         exercisesList = db.getExercises();
-        exercisesAdapter = new ExercisesAdapter(getActivity(), exercisesList, false, this);
-        ListView exercisesListView = (ListView) view.findViewById(R.id.exercises_list);
-        exercisesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mListener.onExerciseClick(exercisesList.get(position));
-            }
-        });
+        exercisesAdapter = new ExercisesAdapter(getContext(), exercisesList, false, this, getActivity());
+        ListView exercisesListView = (ListView) view.findViewById(R.id.all_exercises_list);
         exercisesListView.setAdapter(exercisesAdapter);
 
         EditText exerciseSearch = (EditText) view.findViewById(R.id.exercises_search);
@@ -124,7 +117,6 @@ public class AllExercisesFragment extends Fragment implements ExercisesAdapter.O
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        void onExerciseClick(Exercise exercise);
         void setFavoriteAll(Exercise exercise);
         void removeFavoriteAll(Exercise exercise);
     }

@@ -17,7 +17,7 @@
         android:layout_height="wrap_content" />
 
     <ListView
-        android:id="@+id/exercises_list"
+        android:id="@+id/favorite_exercises_list"
         android:headerDividersEnabled="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

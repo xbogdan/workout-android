@@ -1,6 +1,8 @@
 package com.boamfa.workout.adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,18 +29,24 @@ public class ExercisesAdapter extends BaseAdapter implements Filterable {
     private Context mContext;
     private boolean removeAction;
 
-    OnAdapterInteractionListener mListener;
+    OnAdapterActivityInteractionListener mActivityListener;
+    OnAdapterInteractionListener mFragmentListener;
 
     public interface OnAdapterInteractionListener {
         void setFavorite(Exercise exercise);
         void removeFavorite(Exercise exercise);
     }
 
-    public ExercisesAdapter(Context context, List<Exercise> objects, boolean removeAction, OnAdapterInteractionListener listener) {
+    public interface OnAdapterActivityInteractionListener {
+        void onExerciseClick(Exercise exercise);
+    }
+
+    public ExercisesAdapter(Context context, List<Exercise> objects, boolean removeAction, Fragment fragmentListener, Activity activityListener) {
         this.mObjects = objects;
         this.mContext = context;
         this.removeAction = removeAction;
-        this.mListener = listener;
+        this.mFragmentListener = (OnAdapterInteractionListener) fragmentListener;
+        this.mActivityListener = (OnAdapterActivityInteractionListener) activityListener;
     }
 
     @Override
@@ -69,6 +77,12 @@ public class ExercisesAdapter extends BaseAdapter implements Filterable {
 
         TextView exerciseNameTextView = (TextView) convertView.findViewById(R.id.exercise_name);
         exerciseNameTextView.setText(exercise.name);
+        exerciseNameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mActivityListener.onExerciseClick(exercise);
+            }
+        });
 
         final Button save = (Button) convertView.findViewById(R.id.save);
         if (exercise.favorite) {
@@ -82,7 +96,7 @@ public class ExercisesAdapter extends BaseAdapter implements Filterable {
                     mObjects.get(position).favorite = false;
                     if (removeAction) mObjects.remove(position);
                     notifyDataSetChanged();
-                    mListener.removeFavorite(exercise);
+                    mFragmentListener.removeFavorite(exercise);
                 }
             });
         } else {
@@ -95,7 +109,7 @@ public class ExercisesAdapter extends BaseAdapter implements Filterable {
                     save.setText("Remove");
                     mObjects.get(position).favorite = true;
                     notifyDataSetChanged();
-                    mListener.setFavorite(exercise);
+                    mFragmentListener.setFavorite(exercise);
                 }
             });
         }

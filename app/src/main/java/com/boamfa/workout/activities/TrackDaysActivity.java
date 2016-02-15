@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ExpandableListView;
@@ -102,6 +103,8 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
         ft.addToBackStack("");
         ft.show(f);
         ft.commit();
+        drawerListener.setDrawerIndicatorEnabled(false);
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
     private void hideExercises() {
@@ -111,6 +114,9 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
         fm.popBackStack();
         ft.hide(f);
         ft.commit();
+        getSupportActionBar().show();
+        drawerListener.setDrawerIndicatorEnabled(true);
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
     @Override
@@ -233,6 +239,8 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
         super.onBackPressed();
         if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
             floatingActionButton.show();
+            drawerListener.setDrawerIndicatorEnabled(true);
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
     }
 }

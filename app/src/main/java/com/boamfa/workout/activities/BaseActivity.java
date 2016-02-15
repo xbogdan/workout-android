@@ -15,17 +15,16 @@ import android.widget.ListView;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.DrawerAdapter;
-import com.boamfa.workout.classes.Exercise;
 import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.utils.AppService;
 import com.boamfa.workout.classes.User;
 import com.boamfa.workout.classes.UserLocalStore;
 import com.boamfa.workout.database.DatabaseHandler;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
  * Created by bogdan on 25/11/15.
  */
 public class BaseActivity extends AppCompatActivity {

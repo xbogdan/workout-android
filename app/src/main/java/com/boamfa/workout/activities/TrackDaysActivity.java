@@ -121,7 +121,7 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
 
     @Override
     public void deleteGroup(int groupPosition) {
-        db.deleteTrackDayExercise(trackDayExercises.get(groupPosition).id);
+        db.markDeleteTrackDayExercise(trackDayExercises.get(groupPosition).id);
         trackDayExercises.remove(groupPosition);
         trackDayExercisesAdapter.notifyDataSetChanged();
     }
@@ -152,7 +152,7 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
 
     @Override
     public void deleteChild(int groupPosition, int childPosition) {
-        db.deleteTrackDayExerciseSet(trackDayExercises.get(groupPosition).sets.get(childPosition).id);
+        db.markDeleteTrackDayExerciseSet(trackDayExercises.get(groupPosition).sets.get(childPosition).id);
         trackDayExercises.get(groupPosition).sets.remove(childPosition);
         trackDayExercisesAdapter.notifyDataSetChanged();
     }

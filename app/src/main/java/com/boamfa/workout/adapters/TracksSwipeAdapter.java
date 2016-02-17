@@ -51,7 +51,7 @@ public class TracksSwipeAdapter extends BaseSwipeAdapter {
             public void onClick(View view) {
                 swipeLayout.close(false);
 
-                context.db.deleteTrack(objects.get(position).id);
+                context.db.markDeleteTrack(objects.get(position).id);
 
                 objects.remove(position);
                 notifyDataSetChanged();

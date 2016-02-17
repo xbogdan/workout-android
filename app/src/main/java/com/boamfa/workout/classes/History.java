@@ -8,10 +8,10 @@ public class History {
     public String tableName;
     public byte[] content;
     public long local_id;
-    public String operation;
+    public int operation;
     public String timestamp;
 
-    public History(long id, String tableName, byte[] content, long local_id,  String operation, String timestamp) {
+    public History(long id, String tableName, byte[] content, long local_id,  int operation, String timestamp) {
         this.id = id;
         this.tableName = tableName;
         this.content = content;

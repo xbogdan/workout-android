@@ -16,11 +16,13 @@ public final class DatabaseContract {
     public static abstract class TrackEntry implements BaseColumns {
         public static final String TABLE_NAME = "tracks";
         public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_DELETED = "deleted";
 
         public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY, " +
-                COLUMN_NAME + " TEXT" +
+                COLUMN_NAME + " TEXT, " +
+                COLUMN_DELETED + " INTEGER NOT NULL DEFAULT 0" +
             ")" ;
 
         public static final String SQL_DELETE_ENTRIES =
@@ -36,6 +38,7 @@ public final class DatabaseContract {
         public static final String COLUMN_TRACK_ID = "track_id";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_DATE = "date";
+        public static final String COLUMN_DELETED = "deleted";
 
         public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
@@ -43,6 +46,7 @@ public final class DatabaseContract {
                 COLUMN_NAME + " TEXT, " +
                 COLUMN_DATE + " DATE, " +
                 COLUMN_TRACK_ID + " INTEGER, " +
+                COLUMN_DELETED + " INTEGER NOT NULL DEFAULT 0, " +
                 "FOREIGN KEY (" + COLUMN_TRACK_ID + ") REFERENCES " + TrackEntry.TABLE_NAME + "(" + TrackEntry._ID + ")" +
             ");" ;
 
@@ -59,6 +63,7 @@ public final class DatabaseContract {
         public static final String COLUMN_TRACK_DAY_ID = "track_day_id";
         public static final String COLUMN_EXERCISE_ID = "exercise_id";
         public static final String COLUMN_ORD = "ord";
+        public static final String COLUMN_DELETED = "deleted";
 
         public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
@@ -66,6 +71,7 @@ public final class DatabaseContract {
                 COLUMN_TRACK_DAY_ID + " INTEGER, " +
                 COLUMN_EXERCISE_ID + " INTEGER, " +
                 COLUMN_ORD + " INTEGER, " +
+                COLUMN_DELETED + " INTEGER NOT NULL DEFAULT 0, " +
                 "FOREIGN KEY (" + COLUMN_TRACK_DAY_ID + ") REFERENCES " + TrackDayEntry.TABLE_NAME + "(" + TrackDayEntry._ID + ")" +
                 "FOREIGN KEY (" + COLUMN_EXERCISE_ID + ") REFERENCES " + ExerciseEntry.TABLE_NAME + "(" + ExerciseEntry._ID + ")" +
             ");" ;
@@ -84,6 +90,7 @@ public final class DatabaseContract {
         public static final String COLUMN_REPS = "reps";
         public static final String COLUMN_WEIGHT = "weight";
         public static final String COLUMN_ORD = "ord";
+        public static final String COLUMN_DELETED = "deleted";
 
         public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
@@ -92,6 +99,7 @@ public final class DatabaseContract {
                 COLUMN_REPS + " INTEGER, " +
                 COLUMN_WEIGHT + " FLOAT, " +
                 COLUMN_ORD + " INTEGER, " +
+                COLUMN_DELETED + " INTEGER NOT NULL DEFAULT 0, " +
                 "FOREIGN KEY (" + COLUMN_TRACK_DAY_EXERCISE_ID + ") REFERENCES " + TrackDayExerciseEntry.TABLE_NAME + "(" + TrackDayExerciseEntry._ID + ")" +
             ");" ;
 
@@ -200,9 +208,9 @@ public final class DatabaseContract {
                 HistoryEntry.COLUMN_TABLE_NAME + " TEXT, " +
                 HistoryEntry.COLUMN_LOCAL_ID + " INTEGER, " +
                 HistoryEntry.COLUMN_CONTENT + " BLOB, " +
-                HistoryEntry.COLUMN_OPERATION + " TEXT, " +
-                HistoryEntry.COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP" + // TODO add index
-//                "UNIQUE (" + HistoryEntry.COLUMN_LOCAL_ID + ", " + HistoryEntry.COLUMN_TABLE_NAME + ", " + HistoryEntry.COLUMN_OPERATION + ")" +
+                HistoryEntry.COLUMN_OPERATION + " INTEGER, " +
+                HistoryEntry.COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP, " + // TODO add index
+                "UNIQUE (" + HistoryEntry.COLUMN_LOCAL_ID + ", " + HistoryEntry.COLUMN_TABLE_NAME + ", " + HistoryEntry.COLUMN_OPERATION + ")" +
             ");";
 
         public static final String SQL_DELETE_ENTRIES =

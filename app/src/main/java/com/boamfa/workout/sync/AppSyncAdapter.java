@@ -155,7 +155,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                  * TRACK
                  */
                 if (element.tableName.equals(DatabaseContract.TrackEntry.TABLE_NAME)) {
-                    if (element.operation.equals("insert") || element.operation.equals("update")) {
+                    if (element.operation == DatabaseHandler.INSERT_OP || element.operation == DatabaseHandler.UPDATE_OP) {
                         ByteArrayInputStream bis = new ByteArrayInputStream(element.content);
                         ObjectInputStream in = new ObjectInputStream(bis);
                         Track obj;
@@ -168,7 +168,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                         }
 
                         // INSERT
-                        if (element.operation.equals("insert")) {
+                        if (element.operation == DatabaseHandler.INSERT_OP) {
                             Pair<Integer, String> res = service.createTrack(obj.name);
                             if (res.first == 201) {
                                 try {
@@ -183,7 +183,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                         }
 
                         // UPDATE
-                        if (element.operation.equals("update")) {
+                        if (element.operation == DatabaseHandler.UPDATE_OP) {
                             long serverId = db.getSyncServerId(element.local_id, element.tableName);
 
                             HashMap<String, String> postParams = new HashMap<String, String>();
@@ -198,12 +198,13 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
 
                     // DELETE
-                    if (element.operation.equals("delete")) {
+                    if (element.operation == DatabaseHandler.DELETE_OP) {
                         long serverId = db.getSyncServerId(element.local_id, DatabaseContract.TrackEntry.TABLE_NAME);
                         Pair<Integer, String> res = service.deleteTrack(serverId);
                         if (res.first == 200) {
                             db.deleteSyncEntry(element.local_id, element.tableName);
                             db.deleteHistory(element.id);
+                            db.deleteTrack(element.local_id);
                         }
                     }
                 }
@@ -213,7 +214,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                  * TRACK DAY
                  */
                 if (element.tableName.equals(DatabaseContract.TrackDayEntry.TABLE_NAME)) {
-                    if (element.operation.equals("insert") || element.operation.equals("update")) {
+                    if (element.operation == DatabaseHandler.INSERT_OP || element.operation == DatabaseHandler.UPDATE_OP) {
                         ByteArrayInputStream bis = new ByteArrayInputStream(element.content);
                         ObjectInputStream in = new ObjectInputStream(bis);
                         TrackDay obj;
@@ -226,7 +227,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                         }
 
                         // INSERT
-                        if (element.operation.equals("insert")) {
+                        if (element.operation == DatabaseHandler.INSERT_OP) {
                             long trackServerId = db.getSyncServerId(obj.trackId, DatabaseContract.TrackEntry.TABLE_NAME);
                             Pair<Integer, String> res = service.createTrackDay(trackServerId, obj.date);
                             if (res.first == 201) {
@@ -242,7 +243,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                         }
 
                         // UPDATE
-                        if (element.operation.equals("update")) {
+                        if (element.operation == DatabaseHandler.UPDATE_OP) {
                             long serverId = db.getSyncServerId(element.local_id, element.tableName);
 
                             HashMap<String, String> postParams = new HashMap<String, String>();
@@ -257,12 +258,13 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
 
                     // DELETE
-                    if (element.operation.equals("delete")) {
+                    if (element.operation == DatabaseHandler.DELETE_OP) {
                         long serverId = db.getSyncServerId(element.local_id, element.tableName);
                         Pair<Integer, String> res = service.deleteTrackDay(serverId);
                         if (res.first == 200) {
                             db.deleteSyncEntry(element.local_id, element.tableName);
                             db.deleteHistory(element.id);
+                            db.deleteTrackDay(element.local_id);
                         }
                     }
                 }
@@ -272,7 +274,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                  * TRACK DAY EXERCISE
                  */
                 if (element.tableName.equals(DatabaseContract.TrackDayExerciseEntry.TABLE_NAME)) {
-                    if (element.operation.equals("insert") || element.operation.equals("update")) {
+                    if (element.operation == DatabaseHandler.INSERT_OP || element.operation == DatabaseHandler.UPDATE_OP) {
                         ByteArrayInputStream bis = new ByteArrayInputStream(element.content);
                         ObjectInputStream in = new ObjectInputStream(bis);
                         TrackDayExercise obj;
@@ -285,7 +287,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                         }
 
                         // INSERT
-                        if (element.operation.equals("insert")) {
+                        if (element.operation == DatabaseHandler.INSERT_OP) {
                             long serverExerciseId = db.getSyncServerId(obj.exerciseId, DatabaseContract.ExerciseEntry.TABLE_NAME);
                             long serverTrackDayId = db.getSyncServerId(obj.trackDayId, DatabaseContract.TrackDayEntry.TABLE_NAME);
                             Pair<Integer, String> res = service.createTrackDayExercise(serverTrackDayId, serverExerciseId);
@@ -302,7 +304,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                         }
 
                         // UPDATE
-                        if (element.operation.equals("update")) {
+                        if (element.operation == DatabaseHandler.UPDATE_OP) {
                             long serverId = db.getSyncServerId(element.local_id, element.tableName);
                             long serverExerciseId = db.getSyncServerId(obj.exerciseId, DatabaseContract.ExerciseEntry.TABLE_NAME);
 
@@ -318,12 +320,13 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
 
                     // DELETE
-                    if (element.operation.equals("delete")) {
+                    if (element.operation == DatabaseHandler.DELETE_OP) {
                         long serverId = db.getSyncServerId(element.local_id, element.tableName);
                         Pair<Integer, String> res = service.deleteTrackDayExercise(serverId);
                         if (res.first == 200) {
                             db.deleteSyncEntry(element.local_id, element.tableName);
                             db.deleteHistory(element.id);
+                            db.deleteTrackDayExercise(element.local_id);
                         }
                     }
                 }
@@ -333,7 +336,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                  * TRACK DAY EXERCISE SET
                  */
                 if (element.tableName.equals(DatabaseContract.TrackDayExerciseSetEntry.TABLE_NAME)) {
-                    if (element.operation.equals("insert") || element.operation.equals("update")) {
+                    if (element.operation == DatabaseHandler.INSERT_OP || element.operation == DatabaseHandler.UPDATE_OP) {
                         ByteArrayInputStream bis = new ByteArrayInputStream(element.content);
                         ObjectInputStream in = new ObjectInputStream(bis);
                         TrackDayExerciseSet obj;
@@ -346,7 +349,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                         }
 
                         // INSERT
-                        if (element.operation.equals("insert")) {
+                        if (element.operation == DatabaseHandler.INSERT_OP) {
                             long serverTrackDayExerciseId = db.getSyncServerId(obj.trackDayExerciseId, DatabaseContract.TrackDayExerciseEntry.TABLE_NAME);
 
                             HashMap<String, String> postParams = new HashMap<String, String>();
@@ -358,7 +361,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                             if (res.first == 201) {
                                 try {
                                     JSONObject json = new JSONObject(res.second);
-                                    int serverId = json.getInt("track_id");
+                                    int serverId = json.getInt("id");
                                     db.setSyncId(element.local_id, element.tableName, serverId);
                                     db.deleteHistory(element.id);
                                 } catch (JSONException e) {
@@ -368,7 +371,7 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                         }
 
                         // UPDATE
-                        if (element.operation.equals("update")) {
+                        if (element.operation == DatabaseHandler.UPDATE_OP) {
                             long serverId = db.getSyncServerId(element.local_id, element.tableName);
 
                             HashMap<String, String> postParams = new HashMap<String, String>();
@@ -384,12 +387,13 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
 
                     // DELETE
-                    if (element.operation.equals("delete")) {
+                    if (element.operation == DatabaseHandler.DELETE_OP) {
                         long serverId = db.getSyncServerId(element.local_id, element.tableName);
                         Pair<Integer, String> res = service.deleteTrackDayExerciseSet(serverId);
                         if (res.first == 200) {
                             db.deleteSyncEntry(element.local_id, element.tableName);
                             db.deleteHistory(element.id);
+                            db.deleteTrackDayExerciseSet(element.local_id);
                         }
                     }
                 }

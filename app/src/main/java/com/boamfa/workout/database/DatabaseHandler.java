@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.boamfa.workout.classes.Exercise;
 import com.boamfa.workout.classes.History;
+import com.boamfa.workout.classes.Option;
 import com.boamfa.workout.classes.Track;
 import com.boamfa.workout.classes.TrackDay;
 import com.boamfa.workout.classes.TrackDayExercise;
@@ -52,6 +53,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(ExerciseMuscleGroupEntry.SQL_CREATE_ENTRIES);
         db.execSQL(HistoryEntry.SQL_CREATE_ENTRIES);
         db.execSQL(SyncEntry.SQL_CREATE_ENTRIES);
+        db.execSQL(OptionsEntry.SQL_CREATE_ENTRIES);
     }
 
     @Override
@@ -67,6 +69,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(MuscleGroupEntry.SQL_DELETE_ENTRIES);
         db.execSQL(HistoryEntry.SQL_DELETE_ENTRIES);
         db.execSQL(SyncEntry.SQL_DELETE_ENTRIES);
+        db.execSQL(OptionsEntry.SQL_DELETE_ENTRIES);
 
         // Create tables again
         onCreate(db);
@@ -84,6 +87,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(MuscleGroupEntry.SQL_DELETE_ENTRIES);
         db.execSQL(HistoryEntry.SQL_DELETE_ENTRIES);
         db.execSQL(SyncEntry.SQL_DELETE_ENTRIES);
+        db.execSQL(OptionsEntry.SQL_DELETE_ENTRIES);
 
         onCreate(db);
     }
@@ -694,5 +698,45 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(SyncEntry.TABLE_NAME, SyncEntry.COLUMN_LOCAL_ID + " = ? AND " + SyncEntry.COLUMN_TABLE_NAME + " = ?", new String[]{localId + "", tableName});
         db.close();
+    }
+
+
+    /**
+     * Options
+     */
+    public void setOption(String name, String value) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Option option = getOption(name);
+        if (option != null) {
+            ContentValues values = new ContentValues();
+            values.put(OptionsEntry.COLUMN_VALUE, value);
+
+            db.update(OptionsEntry.TABLE_NAME, values, OptionsEntry._ID + " = ?", new String[]{String.valueOf(option.id)});
+        } else {
+            ContentValues values = new ContentValues();
+            values.put(OptionsEntry.COLUMN_NAME, name);
+            values.put(OptionsEntry.COLUMN_VALUE, value);
+
+            db.insert(OptionsEntry.TABLE_NAME, null, values);
+        }
+        db.close();
+    }
+
+    public Option getOption(String name) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selectQuery =
+                "SELECT _id, name, value FROM " + OptionsEntry.TABLE_NAME +
+                " WHERE " + OptionsEntry.COLUMN_NAME + "='" + name + "'";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        Option option = null;
+        if (cursor.moveToFirst()) {
+            option = new Option(cursor.getLong(0), cursor.getString(1), cursor.getString(2));
+            db.close();
+        }
+
+        return option;
     }
 }

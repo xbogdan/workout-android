@@ -1,17 +1,20 @@
 package com.boamfa.workout.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.ExercisesAdapter;
@@ -93,7 +96,10 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
         });
 
         // Create popup window
-        stw = new SetPopupWindow(this, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+//        stw = new SetPopupWindow(this, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        stw = new SetPopupWindow(this);
+
+
     }
 
     private void showExercises() {
@@ -135,11 +141,11 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
 
     @Override
     public void addChild(final int groupPosition, final ImageView groupIndicator) {
-        stw.showCenter(drawerLayout);
-        stw.okButton.setOnClickListener(new View.OnClickListener() {
+        stw.show();
+        stw.setPositiveButtonOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stw.dismiss();
+                stw.hide();
 
                 TrackDayExerciseSet trackDayExerciseSet = new TrackDayExerciseSet(stw.getReps(), stw.getWeight(), trackDayExercises.get(groupPosition).id);
                 trackDayExerciseSet.id = db.addTrackDayExerciseSet(trackDayExerciseSet);
@@ -159,16 +165,16 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
 
     @Override
     public void editChild(final int groupPosition, final int childPosition) {
-        stw.showCenter(drawerLayout);
+        stw.show();
         final TrackDayExerciseSet trackDayExerciseSet = trackDayExercises.get(groupPosition).sets.get(childPosition);
 
         stw.setWeight(trackDayExerciseSet.weight);
         stw.setReps(trackDayExerciseSet.reps);
 
-        stw.okButton.setOnClickListener(new View.OnClickListener() {
+        stw.setPositiveButtonOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stw.dismiss();
+                stw.hide();
 
                 trackDayExerciseSet.reps = stw.getReps();
                 trackDayExerciseSet.weight = stw.getWeight();
@@ -190,9 +196,9 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
             hideExercises();
             floatingActionButton.show();
         } else {
-            stw.showCenter(drawerLayout);
+            stw.show();
             floatingActionButton.hide();
-            stw.okButton.setOnClickListener(new View.OnClickListener() {
+            stw.setPositiveButtonOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // Add track day exercise
@@ -206,7 +212,7 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
 
                     trackDayExercises.add(trackDayExercise);
                     trackDayExercisesAdapter.notifyDataSetChanged();
-                    stw.dismiss();
+                    stw.hide();
 
                     // Hide fragment
                     hideExercises();

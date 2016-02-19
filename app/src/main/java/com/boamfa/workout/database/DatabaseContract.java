@@ -242,4 +242,25 @@ public final class DatabaseContract {
         public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + SyncEntry.TABLE_NAME;
     }
+
+
+    /**
+     * Options
+     */
+    public static abstract class OptionsEntry implements BaseColumns {
+        public static final String TABLE_NAME = "options";
+        public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_VALUE = "value";
+
+        public static final String SQL_CREATE_ENTRIES =
+            "CREATE TABLE " + TABLE_NAME + " (" +
+                _ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_NAME + " TEXT, " +
+                COLUMN_VALUE + " TEXT, " +
+                "UNIQUE (" + OptionsEntry.COLUMN_NAME + ")" +
+            ");";
+
+        public static final String SQL_DELETE_ENTRIES =
+            "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
 }

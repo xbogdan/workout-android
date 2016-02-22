@@ -190,13 +190,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT _id, date FROM " + TrackDayEntry.TABLE_NAME + " WHERE " + TrackDayEntry.COLUMN_TRACK_ID + " = " + trackId + " AND deleted=0 ORDER BY date DESC";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
-
         if (cursor.moveToFirst()) {
             do {
                 TrackDay element = new TrackDay(Integer.parseInt(cursor.getString(0)), cursor.getString(1));
                 list.add(element);
             } while (cursor.moveToNext());
         }
+
+        for (int i = 0, n = list.size(); i < n; i++) {
+            String q2 = "SELECT mg."+ MuscleGroupEntry.COLUMN_NAME +" FROM "+ TrackDayExerciseEntry.TABLE_NAME +" AS tde " +
+                    "LEFT JOIN "+ ExerciseMuscleGroupEntry.TABLE_NAME +" AS emg ON (tde."+ TrackDayExerciseEntry.COLUMN_EXERCISE_ID +" = emg."+ ExerciseMuscleGroupEntry.COLUMN_EXERCISE_ID + ") " +
+                    "LEFT JOIN "+ MuscleGroupEntry.TABLE_NAME +" AS mg ON(emg."+ ExerciseMuscleGroupEntry.COLUMN_MUSCLE_GROUP_ID +" = mg."+ MuscleGroupEntry._ID + ") " +
+                    "WHERE " +
+                        "tde."+ TrackDayExerciseEntry.COLUMN_TRACK_DAY_ID +" = " + list.get(i).id + " AND " +
+                        "emg."+ ExerciseMuscleGroupEntry.COLUMN_PRIMARY +"=1 and " +
+                        "tde."+ TrackDayExerciseEntry.COLUMN_DELETED +"=0 " +
+                    "GROUP BY emg."+ ExerciseMuscleGroupEntry.COLUMN_MUSCLE_GROUP_ID +" " +
+                    "ORDER BY tde."+ TrackDayExerciseEntry.COLUMN_ORD +", tde."+ TrackDayExerciseEntry._ID + " " +
+                    "LIMIT 5;";
+
+            cursor = db.rawQuery(q2, null);
+            if (cursor.moveToFirst()) {
+                list.get(i).muscleGroups = new ArrayList<>();
+                do {
+                    list.get(i).muscleGroups.add(cursor.getString(0));
+                } while (cursor.moveToNext());
+            }
+        }
+
         db.close();
 
         return list;

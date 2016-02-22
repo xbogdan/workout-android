@@ -1,6 +1,5 @@
 package com.boamfa.workout.activities;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -42,7 +41,7 @@ public class TrackActivity extends BaseActivity {
 
         trackDayList = (ListView) findViewById(R.id.trackDayList);
 
-        trackDaysListAdapter = new TrackSwipeAdapter(this, R.layout.tracks_item, R.id.swipe, trackDays);
+        trackDaysListAdapter = new TrackSwipeAdapter(this, R.layout.track_day_item, R.id.swipe, trackDays);
         trackDayList.setAdapter(trackDaysListAdapter);
         trackDayList.setClickable(true);
         trackDayList.setOnItemClickListener(new ListView.OnItemClickListener() {

@@ -11,13 +11,13 @@ import android.widget.TextView;
 import com.boamfa.workout.R;
 import com.boamfa.workout.activities.BaseActivity;
 import com.boamfa.workout.classes.TrackDay;
-import com.boamfa.workout.utils.Utils;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -111,6 +111,21 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
         }
 
         textView.setText(newDate);
+
+        TextView muscleGroupsTextView = (TextView) convertView.findViewById(R.id.groups);
+        if (muscleGroupsTextView != null) {
+            String groupsString = "";
+            ArrayList<String> muscleGroups = objects.get(position).muscleGroups;
+            if (muscleGroups != null) {
+                for (int i = 0, n = muscleGroups.size(); i < n; i++) {
+                    groupsString += muscleGroups.get(i);
+                    if (i < n - 1) {
+                        groupsString += ", ";
+                    }
+                }
+                muscleGroupsTextView.setText(groupsString);
+            }
+        }
     }
 
     @Override

@@ -1,20 +1,16 @@
 package com.boamfa.workout.activities;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ExpandableListView;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.boamfa.workout.R;
 import com.boamfa.workout.adapters.ExercisesAdapter;
@@ -96,7 +92,6 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
         });
 
         // Create popup window
-//        stw = new SetPopupWindow(this, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         stw = new SetPopupWindow(this);
 
 

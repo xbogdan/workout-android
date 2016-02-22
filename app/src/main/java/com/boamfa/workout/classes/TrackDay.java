@@ -13,7 +13,7 @@ public class TrackDay implements Serializable {
     public String date;
     public long trackId;
     public ArrayList<TrackDayExercise> exercises;
-    public ArrayList<String> muscleGroups;
+    public ArrayList<String> muscleGroups=null;
 
     public TrackDay(String date, long trackId) {
         this.trackId = trackId;

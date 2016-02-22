@@ -141,7 +141,7 @@ public class ExercisesAdapter extends BaseAdapter implements Filterable {
                     constraint = constraint.toString().toLowerCase();
                     for (int i = 0, length = mOriginalValues.size(); i < length; i++) {
                         Exercise item = mOriginalValues.get(i);
-                        if (item.name.toLowerCase().startsWith(constraint.toString())) {
+                        if (item.name.toLowerCase().contains(constraint.toString())) {
                             tempList.add(item);
                         }
                     }

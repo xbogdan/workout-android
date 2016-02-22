@@ -211,9 +211,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             cursor = db.rawQuery(q2, null);
             if (cursor.moveToFirst()) {
-                list.get(i).muscleGroups = new ArrayList<>();
+                TrackDay element = list.get(i);
+                element.muscleGroups = new ArrayList<>();
                 do {
-                    list.get(i).muscleGroups.add(cursor.getString(0));
+                    element.muscleGroups.add(cursor.getString(0));
                 } while (cursor.moveToNext());
             }
         }
@@ -556,6 +557,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 id = Long.parseLong(cursor.getString(0));
+                cursor.close();
                 break;
             } while (cursor.moveToNext());
         }
@@ -640,7 +642,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             db.close();
-            return cursor.getLong(0);
+            Long c = cursor.getLong(0);
+            cursor.close();
+            return c;
         }
         return new Long(0);
     }
@@ -657,7 +661,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             db.close();
-            return cursor.getLong(0);
+            Long c = cursor.getLong(0);
+            cursor.close();
+            return c;
         }
         return new Long(0);
     }
@@ -672,10 +678,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
+        boolean found = false;
         if (cursor.moveToFirst()) {
-            db.close();
-            return true;
+            do {
+                found = true;
+                break;
+            } while (cursor.moveToNext());
         }
+        db.close();
+        cursor.close();
+
+        if (found) return true;
         return false;
     }
 
@@ -689,10 +702,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
+        boolean found = false;
         if (cursor.moveToFirst()) {
-            db.close();
-            return true;
+            do {
+                found = true;
+                break;
+            } while (cursor.moveToNext());
         }
+        db.close();
+        cursor.close();
+
+        if (found) return true;
         return false;
     }
 

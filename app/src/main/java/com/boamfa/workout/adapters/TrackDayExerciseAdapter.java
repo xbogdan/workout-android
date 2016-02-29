@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -95,7 +96,11 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
 
         TextView tv = (TextView) view.findViewById(R.id.surface_text_view);
         DecimalFormat df = new DecimalFormat("###.#");
-        tv.setText(df.format(child.weight) + " kg  x  " + child.reps + " reps");
+        if (child.weight == 0) {
+            tv.setText(child.reps + " reps");
+        } else {
+            tv.setText(df.format(child.weight) + " kg  x  " + child.reps + " reps");
+        }
 
         return view;
     }
@@ -163,7 +168,7 @@ public class TrackDayExerciseAdapter extends BaseExpandableListAdapter {
         TextView tv = (TextView) view.findViewById(R.id.surface_text_view);
         tv.setText(group.name);
 
-        Button addSetbutton = (Button) view.findViewById(R.id.add_set);
+        ImageButton addSetbutton = (ImageButton) view.findViewById(R.id.add_set);
         addSetbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

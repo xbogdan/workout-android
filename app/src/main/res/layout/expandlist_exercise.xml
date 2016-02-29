@@ -58,23 +58,24 @@
 
         <TextView
             android:id="@+id/surface_text_view"
+            android:textSize="14sp"
             android:paddingTop="15dp"
-            android:textSize="14dp"
-            android:layout_weight="1"
             android:paddingBottom="15dp"
             android:textColor="@android:color/black"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_width="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
-        <Button
+        <ImageButton
             android:id="@+id/add_set"
-            android:text="add set"
-            android:textSize="10dp"
-            android:textColor="#27ae60"
+            android:paddingRight="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-    <!-- Surface View End -->
+            android:src="@drawable/plus" />
+
+</LinearLayout>
+<!-- Surface View End -->
 </com.daimajia.swipe.SwipeLayout>

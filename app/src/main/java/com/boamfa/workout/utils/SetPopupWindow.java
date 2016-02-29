@@ -65,7 +65,11 @@ public class SetPopupWindow {
     }
 
     public double getWeight() {
-        return Double.parseDouble(weightField.getText().toString());
+        String weight = weightField.getText().toString();
+        if (weight.length() == 0) {
+            return 0;
+        }
+        return Double.parseDouble(weight);
     }
 
     public int getReps() {

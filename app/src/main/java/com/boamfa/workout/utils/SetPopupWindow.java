@@ -73,7 +73,12 @@ public class SetPopupWindow {
     }
 
     public int getReps() {
-        return Integer.parseInt(repsField.getText().toString());
+        String reps = repsField.getText().toString();
+        if (reps.length() == 0) {
+            return 0;
+        } else {
+            return Integer.parseInt(repsField.getText().toString());
+        }
     }
 
     public void setReps(int reps) {

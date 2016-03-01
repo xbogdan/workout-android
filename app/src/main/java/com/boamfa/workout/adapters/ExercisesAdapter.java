@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.boamfa.workout.R;
@@ -84,15 +85,15 @@ public class ExercisesAdapter extends BaseAdapter implements Filterable {
             }
         });
 
-        final Button save = (Button) convertView.findViewById(R.id.save);
+        final ImageButton save = (ImageButton) convertView.findViewById(R.id.save);
         if (exercise.favorite) {
-            save.setText("Remove");
+            save.setImageResource(R.drawable.star);
             save.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     DatabaseHandler db = new DatabaseHandler(mContext);
                     db.deleteFavoriteExercise(exercise.id);
-                    save.setText("Save");
+                    save.setImageResource(R.drawable.star_outline);
                     mObjects.get(position).favorite = false;
                     if (removeAction) mObjects.remove(position);
                     notifyDataSetChanged();
@@ -100,13 +101,13 @@ public class ExercisesAdapter extends BaseAdapter implements Filterable {
                 }
             });
         } else {
-            save.setText("Save");
+            save.setImageResource(R.drawable.star_outline);
             save.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     DatabaseHandler db = new DatabaseHandler(mContext);
                     db.addFavoriteExercise(exercise.id);
-                    save.setText("Remove");
+                    save.setImageResource(R.drawable.star);
                     mObjects.get(position).favorite = true;
                     notifyDataSetChanged();
                     mFragmentListener.setFavorite(exercise);

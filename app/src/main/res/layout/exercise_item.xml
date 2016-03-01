@@ -11,13 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <Button
+    <ImageButton
         android:id="@+id/save"
-        android:text="save"
-        android:textSize="10dp"
-        android:textColor="#27ae60"
+        android:layout_marginRight="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:background="@android:color/transparent"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content" />
+        android:src="@drawable/star"/>
 </LinearLayout>

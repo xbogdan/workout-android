@@ -93,8 +93,6 @@ public class TrackDaysActivity extends BaseActivity implements TrackDayExerciseA
 
         // Create popup window
         stw = new SetPopupWindow(this);
-
-
     }
 
     private void showExercises() {

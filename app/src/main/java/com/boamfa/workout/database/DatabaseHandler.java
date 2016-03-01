@@ -198,16 +198,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         for (int i = 0, n = list.size(); i < n; i++) {
-            String q2 = "SELECT mg."+ MuscleGroupEntry.COLUMN_NAME +" FROM "+ TrackDayExerciseEntry.TABLE_NAME +" AS tde " +
-                    "LEFT JOIN "+ ExerciseMuscleGroupEntry.TABLE_NAME +" AS emg ON (tde."+ TrackDayExerciseEntry.COLUMN_EXERCISE_ID +" = emg."+ ExerciseMuscleGroupEntry.COLUMN_EXERCISE_ID + ") " +
-                    "LEFT JOIN "+ MuscleGroupEntry.TABLE_NAME +" AS mg ON(emg."+ ExerciseMuscleGroupEntry.COLUMN_MUSCLE_GROUP_ID +" = mg."+ MuscleGroupEntry._ID + ") " +
+            String q2 = "SELECT IFNULL(mg2."+ MuscleGroupEntry.COLUMN_NAME +", mg."+ MuscleGroupEntry.COLUMN_NAME + ") AS muscle_group_name " +
+                    "FROM "+ TrackDayExerciseEntry.TABLE_NAME +" AS tde " +
+                        "LEFT JOIN "+ ExerciseMuscleGroupEntry.TABLE_NAME +" AS emg ON (tde."+ TrackDayExerciseEntry.COLUMN_EXERCISE_ID +" = emg."+ ExerciseMuscleGroupEntry.COLUMN_EXERCISE_ID + ") " +
+                        "LEFT JOIN "+ MuscleGroupEntry.TABLE_NAME +" AS mg ON(emg."+ ExerciseMuscleGroupEntry.COLUMN_MUSCLE_GROUP_ID +" = mg."+ MuscleGroupEntry._ID + ") " +
+                        "LEFT JOIN "+ MuscleGroupEntry.TABLE_NAME +" AS mg2 ON(mg."+ MuscleGroupEntry.COLUMN_MUSCLE_GROUP_ID +" = mg2."+ MuscleGroupEntry._ID + ") " +
                     "WHERE " +
                         "tde."+ TrackDayExerciseEntry.COLUMN_TRACK_DAY_ID +" = " + list.get(i).id + " AND " +
                         "emg."+ ExerciseMuscleGroupEntry.COLUMN_PRIMARY +"=1 and " +
                         "tde."+ TrackDayExerciseEntry.COLUMN_DELETED +"=0 " +
-                    "GROUP BY emg."+ ExerciseMuscleGroupEntry.COLUMN_MUSCLE_GROUP_ID +" " +
+                    "GROUP BY muscle_group_name " +
                     "ORDER BY tde."+ TrackDayExerciseEntry.COLUMN_ORD +", tde."+ TrackDayExerciseEntry._ID + " " +
                     "LIMIT 5;";
+
+            System.out.println(q2);
 
             cursor = db.rawQuery(q2, null);
             if (cursor.moveToFirst()) {

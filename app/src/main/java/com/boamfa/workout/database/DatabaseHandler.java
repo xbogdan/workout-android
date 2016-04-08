@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Pair;
 
 import com.boamfa.workout.classes.Exercise;
 import com.boamfa.workout.classes.History;
@@ -198,7 +199,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         for (int i = 0, n = list.size(); i < n; i++) {
-            String q2 = "SELECT IFNULL(mg2."+ MuscleGroupEntry.COLUMN_NAME +", mg."+ MuscleGroupEntry.COLUMN_NAME + ") AS muscle_group_name " +
+            String q2 = "SELECT IFNULL(mg2."+ MuscleGroupEntry.COLUMN_NAME +", mg."+ MuscleGroupEntry.COLUMN_NAME + ") AS muscle_group_name " + // + " IFNULL(mg2."+ MuscleGroupEntry.COLUMN_COLOR +", mg."+ MuscleGroupEntry.COLUMN_COLOR + ") AS muscle_group_color                                       , " +
                     "FROM "+ TrackDayExerciseEntry.TABLE_NAME +" AS tde " +
                         "LEFT JOIN "+ ExerciseMuscleGroupEntry.TABLE_NAME +" AS emg ON (tde."+ TrackDayExerciseEntry.COLUMN_EXERCISE_ID +" = emg."+ ExerciseMuscleGroupEntry.COLUMN_EXERCISE_ID + ") " +
                         "LEFT JOIN "+ MuscleGroupEntry.TABLE_NAME +" AS mg ON(emg."+ ExerciseMuscleGroupEntry.COLUMN_MUSCLE_GROUP_ID +" = mg."+ MuscleGroupEntry._ID + ") " +
@@ -211,14 +212,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     "ORDER BY tde."+ TrackDayExerciseEntry.COLUMN_ORD +", tde."+ TrackDayExerciseEntry._ID + " " +
                     "LIMIT 5;";
 
-            System.out.println(q2);
+//            System.out.println(q2);
 
             cursor = db.rawQuery(q2, null);
             if (cursor.moveToFirst()) {
                 TrackDay element = list.get(i);
                 element.muscleGroups = new ArrayList<>();
                 do {
-                    element.muscleGroups.add(cursor.getString(0));
+                    element.muscleGroups.add(new Pair(cursor.getString(0), ""));
                 } while (cursor.moveToNext());
             }
         }

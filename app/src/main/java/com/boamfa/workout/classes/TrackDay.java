@@ -1,5 +1,7 @@
 package com.boamfa.workout.classes;
 
+import android.util.Pair;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,7 @@ public class TrackDay implements Serializable {
     public String date;
     public long trackId;
     public ArrayList<TrackDayExercise> exercises;
-    public ArrayList<String> muscleGroups=null;
+    public ArrayList<Pair<String, String>> muscleGroups=null;
 
     public TrackDay(String date, long trackId) {
         this.trackId = trackId;

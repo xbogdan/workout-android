@@ -100,6 +100,10 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                         e.printStackTrace();
                     }
                 }
+                if (response.first/100 == 4) {
+                    accountManager.invalidateAuthToken(accountType, authToken);
+                }
+
 
 
                 /**
@@ -123,6 +127,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                }
+                if (response.first/100 == 4) {
+                    accountManager.invalidateAuthToken(accountType, authToken);
                 }
 
                 
@@ -149,6 +156,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                }
+                if (response.first/100 == 4) {
+                    accountManager.invalidateAuthToken(accountType, authToken);
                 }
 
                 db.setOption("first_time_sync", "1");
@@ -189,6 +199,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                                     e.printStackTrace();
                                 }
                             }
+                            if (res.first/100 == 4) {
+                                accountManager.invalidateAuthToken(accountType, authToken);
+                            }
                         }
 
                         // UPDATE
@@ -203,6 +216,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                             if (res.first == 200) {
                                 db.deleteHistory(element.id);
                             }
+                            if (res.first/100 == 4) {
+                                accountManager.invalidateAuthToken(accountType, authToken);
+                            }
                         }
                     }
 
@@ -214,6 +230,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                             db.deleteSyncEntry(element.local_id, element.tableName);
                             db.deleteHistory(element.id);
                             db.deleteTrack(element.local_id);
+                        }
+                        if (res.first/100 == 4) {
+                            accountManager.invalidateAuthToken(accountType, authToken);
                         }
                     }
                 }
@@ -249,6 +268,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                                     e.printStackTrace();
                                 }
                             }
+                            if (res.first/100 == 4) {
+                                accountManager.invalidateAuthToken(accountType, authToken);
+                            }
                         }
 
                         // UPDATE
@@ -263,6 +285,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                             if (res.first == 200) {
                                 db.deleteHistory(element.id);
                             }
+                            if (res.first/100 == 4) {
+                                accountManager.invalidateAuthToken(accountType, authToken);
+                            }
                         }
                     }
 
@@ -274,6 +299,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                             db.deleteSyncEntry(element.local_id, element.tableName);
                             db.deleteHistory(element.id);
                             db.deleteTrackDay(element.local_id);
+                        }
+                        if (res.first/100 == 4) {
+                            accountManager.invalidateAuthToken(accountType, authToken);
                         }
                     }
                 }
@@ -310,6 +338,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                                     e.printStackTrace();
                                 }
                             }
+                            if (res.first/100 == 4) {
+                                accountManager.invalidateAuthToken(accountType, authToken);
+                            }
                         }
 
                         // UPDATE
@@ -325,6 +356,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                             if (res.first == 200) {
                                 db.deleteHistory(element.id);
                             }
+                            if (res.first/100 == 4) {
+                                accountManager.invalidateAuthToken(accountType, authToken);
+                            }
                         }
                     }
 
@@ -336,6 +370,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                             db.deleteSyncEntry(element.local_id, element.tableName);
                             db.deleteHistory(element.id);
                             db.deleteTrackDayExercise(element.local_id);
+                        }
+                        if (res.first/100 == 4) {
+                            accountManager.invalidateAuthToken(accountType, authToken);
                         }
                     }
                 }
@@ -377,6 +414,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                                     e.printStackTrace();
                                 }
                             }
+                            if (res.first/100 == 4) {
+                                accountManager.invalidateAuthToken(accountType, authToken);
+                            }
                         }
 
                         // UPDATE
@@ -392,6 +432,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                             if (res.first == 200) {
                                 db.deleteHistory(element.id);
                             }
+                            if (res.first/100 == 4) {
+                                accountManager.invalidateAuthToken(accountType, authToken);
+                            }
                         }
                     }
 
@@ -403,6 +446,9 @@ public class AppSyncAdapter extends AbstractThreadedSyncAdapter {
                             db.deleteSyncEntry(element.local_id, element.tableName);
                             db.deleteHistory(element.id);
                             db.deleteTrackDayExerciseSet(element.local_id);
+                        }
+                        if (res.first/100 == 4) {
+                            accountManager.invalidateAuthToken(accountType, authToken);
                         }
                     }
                 }

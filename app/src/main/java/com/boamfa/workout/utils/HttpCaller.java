@@ -78,6 +78,10 @@ public class HttpCaller {
 
         int responseCode = con.getResponseCode();
 
+        if (responseCode/100 == 4) {
+            // TODO Invalidate auth token HERE not in sync adapter
+        }
+
         StringBuffer response;
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));

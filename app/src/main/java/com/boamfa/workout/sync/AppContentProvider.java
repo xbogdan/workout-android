@@ -76,7 +76,6 @@ public class AppContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        System.out.println(values);
         if (URI_MATCHER.match(uri) == TRACK_LIST) {
             long id = db.addTrack(new Track(11, "TEST 101"));
             return getUriForId(id, uri);

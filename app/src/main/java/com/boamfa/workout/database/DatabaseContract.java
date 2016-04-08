@@ -159,12 +159,14 @@ public final class DatabaseContract {
         public static final String TABLE_NAME = "muscle_groups";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_MUSCLE_GROUP_ID = "muscle_group_id";
+        public static final String COLUMN_COLOR = "color";
 
         public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY, " +
                 COLUMN_NAME + " TEXT, " +
-                COLUMN_MUSCLE_GROUP_ID + " INTEGER " +
+                COLUMN_MUSCLE_GROUP_ID + " INTEGER, " +
+                COLUMN_COLOR + " TEXT " +
             ");" ;
 
         public static final String SQL_DELETE_ENTRIES =

@@ -2,6 +2,7 @@ package com.boamfa.workout.adapters;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,21 +110,21 @@ public class TrackSwipeAdapter extends BaseSwipeAdapter {
             e.printStackTrace();
             newDate = objects.get(position).date;
         }
-
-        textView.setText(newDate);
-
+        // TODO review
         TextView muscleGroupsTextView = (TextView) convertView.findViewById(R.id.groups);
+        muscleGroupsTextView.setText(newDate);
+
         if (muscleGroupsTextView != null) {
             String groupsString = "";
-            ArrayList<String> muscleGroups = objects.get(position).muscleGroups;
+            ArrayList<Pair<String, String>> muscleGroups = objects.get(position).muscleGroups;
             if (muscleGroups != null) {
                 for (int i = 0, n = muscleGroups.size(); i < n; i++) {
-                    groupsString += muscleGroups.get(i);
+                    groupsString += muscleGroups.get(i).first;
                     if (i < n - 1) {
                         groupsString += ", ";
                     }
                 }
-                muscleGroupsTextView.setText(groupsString);
+                textView.setText(groupsString);
             }
         }
     }

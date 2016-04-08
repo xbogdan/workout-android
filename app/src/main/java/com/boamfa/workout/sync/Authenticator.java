@@ -47,7 +47,6 @@ public class Authenticator extends AbstractAccountAuthenticator {
         return bundle;
     }
 
-    // Getting an authentication token is not supported
     @Override
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
         // Extract the username and password from the Account Manager, and ask
@@ -97,7 +96,6 @@ public class Authenticator extends AbstractAccountAuthenticator {
     // Getting a label for the auth token is not supported
     @Override
     public String getAuthTokenLabel(String s) {
-        System.out.println(s);
         return "MANELE";
 //        throw new UnsupportedOperationException();
     }
